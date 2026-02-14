@@ -73,7 +73,8 @@
   const heartField = document.getElementById("heartField");
 
   // ===================== STATE =====================
-  const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+  const prefersReduced =
+    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
   const smallScreen = Math.min(innerWidth, innerHeight) < 520;
 
   const state = {
@@ -91,7 +92,32 @@
     heartRate: 65
   };
 
-  // bind UI defaults
+  // ===================== HELPERS =====================
+  function rand(a, b) { return a + Math.random() * (b - a); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function dist(x1, y1, x2, y2) { return Math.hypot(x2 - x1, y2 - y1); }
+  function withAlpha(hex, a) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+  function safeLocalStorageGet(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw == null) return fallback;
+      const val = JSON.parse(raw);
+      return val ?? fallback;
+    } catch {
+      return fallback;
+    }
+  }
+  function safeLocalStorageSet(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch { /* ignore */ }
+  }
+
+  // ===================== UI DEFAULTS =====================
   tEco.checked = state.eco;
   tNeon.checked = state.neon;
   tHearts.checked = state.hearts;
@@ -101,7 +127,7 @@
   sIntensity.value = String(state.intensity);
   sHearts.value = String(state.heartRate);
 
-  function applyClasses(){
+  function applyClasses() {
     document.body.classList.toggle("eco", state.eco);
     document.body.classList.toggle("neon", state.neon);
   }
@@ -110,71 +136,78 @@
   // ===================== INTRO =====================
   let introIdx = 0;
   const introTicker = setInterval(() => {
+    if (!introLine) return;
     introLine.textContent = LOVE_LINES[introIdx % LOVE_LINES.length];
     introIdx++;
   }, 900);
 
-  function startExperience(){
+  function startExperience() {
     if (state.started) return;
     state.started = true;
 
-    intro.classList.add("hidden");
-    setTimeout(() => intro.remove(), 650);
+    if (intro) {
+      intro.classList.add("hidden");
+      setTimeout(() => intro?.remove?.(), 650);
+    }
 
-    // show first message + burst
     setMessage(0, true);
     setTimeout(() => loveBurst(120, 50), 250);
   }
 
-  intro.addEventListener("pointerup", startExperience, { passive: true });
+  intro?.addEventListener?.("pointerup", startExperience, { passive: true });
   window.addEventListener("keydown", (e) => {
     if (!state.started && (e.key === "Enter" || e.key === " ")) startExperience();
   });
 
   // ===================== NAVIGATION =====================
-  function setActiveNav(){
-    [toLove, toDraw, toGame].forEach(b => b.classList.remove("active"));
-    if (state.screen === "love") toLove.classList.add("active");
-    if (state.screen === "draw") toDraw.classList.add("active");
-    if (state.screen === "game") toGame.classList.add("active");
+  function setActiveNav() {
+    [toLove, toDraw, toGame].forEach((b) => b?.classList?.remove("active"));
+    if (state.screen === "love") toLove?.classList?.add("active");
+    if (state.screen === "draw") toDraw?.classList?.add("active");
+    if (state.screen === "game") toGame?.classList?.add("active");
   }
 
-  function showScreen(name){
+  function showScreen(name) {
     if (!state.started) startExperience();
     state.screen = name;
 
-    screenLove.classList.toggle("active", name === "love");
-    screenDraw.classList.toggle("active", name === "draw");
-    screenGame.classList.toggle("active", name === "game");
+    screenLove?.classList?.toggle("active", name === "love");
+    screenDraw?.classList?.toggle("active", name === "draw");
+    screenGame?.classList?.toggle("active", name === "game");
 
-    screenLove.setAttribute("aria-hidden", name === "love" ? "false" : "true");
-    screenDraw.setAttribute("aria-hidden", name === "draw" ? "false" : "true");
-    screenGame.setAttribute("aria-hidden", name === "game" ? "false" : "true");
+    screenLove?.setAttribute?.("aria-hidden", name === "love" ? "false" : "true");
+    screenDraw?.setAttribute?.("aria-hidden", name === "draw" ? "false" : "true");
+    screenGame?.setAttribute?.("aria-hidden", name === "game" ? "false" : "true");
 
     setActiveNav();
 
-    // friendly footer messages (only from list)
     if (name === "draw") drawMsg.textContent = LOVE_LINES[(msgIndex + 1) % LOVE_LINES.length];
     if (name === "game") gameMsg.textContent = LOVE_LINES[(msgIndex + 2) % LOVE_LINES.length];
 
-    // resize canvases to correct layout
     resizeAllCanvases();
   }
 
-  toLove.addEventListener("click", () => showScreen("love"));
-  toDraw.addEventListener("click", () => showScreen("draw"));
-  toGame.addEventListener("click", () => showScreen("game"));
+  toLove?.addEventListener?.("click", () => showScreen("love"));
+  toDraw?.addEventListener?.("click", () => showScreen("draw"));
+  toGame?.addEventListener?.("click", () => showScreen("game"));
 
   setActiveNav();
 
   // ===================== CONTROL PANEL =====================
-  function openControls(){ panel.classList.add("open"); panel.setAttribute("aria-hidden","false"); }
-  function closeControls(){ panel.classList.remove("open"); panel.setAttribute("aria-hidden","true"); }
-  openPanel.addEventListener("click", openControls);
-  closePanel.addEventListener("click", closeControls);
+  function openControls() {
+    panel?.classList?.add("open");
+    panel?.setAttribute?.("aria-hidden", "false");
+  }
+  function closeControls() {
+    panel?.classList?.remove("open");
+    panel?.setAttribute?.("aria-hidden", "true");
+  }
+
+  openPanel?.addEventListener?.("click", openControls);
+  closePanel?.addEventListener?.("click", closeControls);
 
   window.addEventListener("pointerup", (e) => {
-    if (!panel.classList.contains("open")) return;
+    if (!panel?.classList?.contains("open")) return;
     const within = panel.contains(e.target) || openPanel.contains(e.target);
     if (!within) closeControls();
   }, { passive: true });
@@ -203,6 +236,7 @@
       intensity: 1.0,
       heartRate: 65
     });
+
     tEco.checked = state.eco;
     tNeon.checked = state.neon;
     tHearts.checked = state.hearts;
@@ -211,6 +245,7 @@
     tMotionLock.checked = state.motionLock;
     sIntensity.value = String(state.intensity);
     sHearts.value = String(state.heartRate);
+
     applyClasses();
     resizeFX();
     refreshHearts();
@@ -243,11 +278,10 @@
   });
 
   // ===================== LOVE SCREEN TEXT =====================
-  // Typewriter main title is constant, subtitle cycles ONLY from LOVE_LINES.
   const titleText = "I Love You Hannah Banana 💘";
   let titleI = 0;
 
-  function typeTitle(){
+  function typeTitle() {
     typeEl.textContent = titleText.slice(0, titleI);
     titleI++;
     if (titleI <= titleText.length) setTimeout(typeTitle, 48);
@@ -256,9 +290,9 @@
 
   let msgIndex = 0;
 
-  function setMessage(idx, immediate = false){
+  function setMessage(idx, immediate = false) {
     msgIndex = idx % LOVE_LINES.length;
-    if (immediate){
+    if (immediate) {
       subtitle.textContent = LOVE_LINES[msgIndex];
       subtitle.style.opacity = 1;
       subtitle.style.transform = "translateY(0)";
@@ -273,7 +307,6 @@
     }, 220);
   }
 
-  // start message (before intro ends)
   subtitle.textContent = LOVE_LINES[0];
 
   momentBtn.addEventListener("click", () => {
@@ -290,7 +323,6 @@
     if (e.key.toLowerCase() === "m") spawnMeteor(true);
   });
 
-  // Tap anywhere: sparkles + mini burst (also starts experience)
   window.addEventListener("pointerup", (e) => {
     if (!state.started) startExperience();
     addSparks(e.clientX, e.clientY, state.eco ? 40 : 66);
@@ -301,15 +333,14 @@
   let tiltX = 0, tiltY = 0;
   let tilting = false;
 
-  function applyTilt(){
+  function applyTilt() {
     const rx = (tiltY * -8).toFixed(2);
     const ry = (tiltX * 10).toFixed(2);
-    // only tilt love screen card (keeps draw/game stable)
     if (state.screen === "love") {
       cardLove.style.transform = `perspective(1100px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
     }
   }
-  function setTiltFromClient(x, y){
+  function setTiltFromClient(x, y) {
     tiltX = (x / innerWidth) * 2 - 1;
     tiltY = (y / innerHeight) * 2 - 1;
     applyTilt();
@@ -334,60 +365,60 @@
     applyTilt();
   }, { passive: true });
 
-  // ===================== BACKGROUND FX (stars + aurora + sparks + meteors + constellations) =====================
-  let W=0, H=0, DPR=1;
+  // ===================== BACKGROUND FX =====================
+  let W = 0, H = 0, DPR = 1;
   let stars = [];
   let wisps = [];
   let sparks = [];
   let meteors = [];
 
-  function starCount(){
+  function starCount() {
     const base = state.eco ? 95000 : 68000;
-    return Math.floor((W*H) / base);
+    return Math.floor((W * H) / base);
   }
-  function wispCount(){ return state.eco ? 5 : 9; }
+  function wispCount() { return state.eco ? 5 : 9; }
 
-  function newWisp(){
+  function newWisp() {
     return {
-      x: Math.random()*W,
-      y: Math.random()*H,
+      x: Math.random() * W,
+      y: Math.random() * H,
       vx: rand(-0.12, 0.12) * DPR,
       vy: rand(-0.08, 0.08) * DPR,
       a: rand(0.08, 0.16),
       r: rand(220, 520) * DPR,
       hue: Math.random() < 0.5 ? rand(300, 335) : rand(190, 205),
-      ph: rand(0, Math.PI*2)
+      ph: rand(0, Math.PI * 2)
     };
   }
 
-  function resizeFX(){
+  function resizeFX() {
     DPR = Math.min(2, window.devicePixelRatio || 1);
     W = Math.floor(innerWidth * DPR);
     H = Math.floor(innerHeight * DPR);
     fx.width = W; fx.height = H;
 
     stars = Array.from({ length: starCount() }, () => ({
-      x: Math.random()*W,
-      y: Math.random()*H,
+      x: Math.random() * W,
+      y: Math.random() * H,
       z: rand(0.25, 1.0),
       r: rand(0.6, 1.7) * DPR,
-      tw: rand(0, Math.PI*2),
+      tw: rand(0, Math.PI * 2),
       hue: rand(310, 360)
     }));
 
     wisps = Array.from({ length: wispCount() }, () => newWisp());
   }
 
-  function addSparks(x, y, count=50){
-    for (let k=0; k<count; k++){
-      const ang = Math.random()*Math.PI*2;
+  function addSparks(x, y, count = 50) {
+    for (let k = 0; k < count; k++) {
+      const ang = Math.random() * Math.PI * 2;
       const spd = rand(1.2, state.eco ? 5.6 : 7.2) * DPR;
       sparks.push({
-        x: x*DPR, y: y*DPR,
-        vx: Math.cos(ang)*spd,
-        vy: Math.sin(ang)*spd,
+        x: x * DPR, y: y * DPR,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd,
         life: rand(22, state.eco ? 44 : 60),
-        r: rand(1.0, 2.2)*DPR,
+        r: rand(1.0, 2.2) * DPR,
         hue: rand(300, 360)
       });
     }
@@ -395,13 +426,13 @@
     if (sparks.length > cap) sparks.splice(0, sparks.length - cap);
   }
 
-  function spawnMeteor(force=false){
+  function spawnMeteor(force = false) {
     if (!state.meteors && !force) return;
     if (!force && Math.random() > (state.eco ? 0.004 : 0.007)) return;
 
     const fromLeft = Math.random() < 0.5;
-    const x = fromLeft ? rand(-0.2, 0.2)*W : rand(0.8, 1.2)*W;
-    const y = rand(0.05, 0.35)*H;
+    const x = fromLeft ? rand(-0.2, 0.2) * W : rand(0.8, 1.2) * W;
+    const y = rand(0.05, 0.35) * H;
     const vx = fromLeft ? rand(8, 12) : rand(-12, -8);
     const vy = rand(3, 6);
 
@@ -410,43 +441,40 @@
       vx: vx * DPR,
       vy: vy * DPR,
       life: 1.0,
-      len: rand(160, 280)*DPR
+      len: rand(160, 280) * DPR
     });
 
     const cap = state.eco ? 2 : 4;
     if (meteors.length > cap) meteors.splice(0, meteors.length - cap);
   }
 
-  // perf heuristic
   let frameSamples = [];
-  function updatePerf(ms){
+  function updatePerf(ms) {
     frameSamples.push(ms);
     if (frameSamples.length > 30) frameSamples.shift();
-    const avg = frameSamples.reduce((a,b)=>a+b,0)/frameSamples.length;
+    const avg = frameSamples.reduce((a, b) => a + b, 0) / frameSamples.length;
     perfPill.textContent = (avg > 20 && !state.eco) ? "🧊 try eco" : "⚡ smooth";
   }
 
   let lastT = performance.now();
-  function fxFrame(t){
+  function fxFrame(t) {
     const rawDt = Math.min(34, t - lastT);
     lastT = t;
     const dt = rawDt * state.intensity;
 
     updatePerf(rawDt);
 
-    // trail fade
     fxCtx.globalCompositeOperation = "source-over";
     fxCtx.globalAlpha = 0.16;
     fxCtx.fillStyle = "#06040d";
-    fxCtx.fillRect(0,0,W,H);
+    fxCtx.fillRect(0, 0, W, H);
     fxCtx.globalAlpha = 1;
 
     const parX = tiltX * 18 * DPR;
     const parY = tiltY * 12 * DPR;
 
-    // wisps
     fxCtx.globalCompositeOperation = "lighter";
-    for (const w of wisps){
+    for (const w of wisps) {
       w.ph += 0.0016 * dt;
       w.x += w.vx * dt;
       w.y += w.vy * dt;
@@ -456,8 +484,8 @@
       if (w.y < -w.r) w.y = H + w.r;
       if (w.y > H + w.r) w.y = -w.r;
 
-      const pulse = 0.6 + 0.4*Math.sin(w.ph);
-      const rr = w.r * (0.82 + 0.18*pulse);
+      const pulse = 0.6 + 0.4 * Math.sin(w.ph);
+      const rr = w.r * (0.82 + 0.18 * pulse);
 
       const gx = w.x + parX * w.a * 1.2;
       const gy = w.y + parY * w.a * 1.1;
@@ -465,48 +493,46 @@
       const g = fxCtx.createRadialGradient(gx, gy, 0, gx, gy, rr);
       const a = w.a * (state.eco ? 0.85 : 1.0);
       g.addColorStop(0, `hsla(${w.hue}, 95%, 70%, ${a * 0.55})`);
-      g.addColorStop(0.45, `hsla(${w.hue+18}, 95%, 65%, ${a * 0.22})`);
-      g.addColorStop(1, `hsla(${w.hue+40}, 95%, 60%, 0)`);
+      g.addColorStop(0.45, `hsla(${w.hue + 18}, 95%, 65%, ${a * 0.22})`);
+      g.addColorStop(1, `hsla(${w.hue + 40}, 95%, 60%, 0)`);
       fxCtx.fillStyle = g;
       fxCtx.beginPath();
-      fxCtx.arc(gx, gy, rr, 0, Math.PI*2);
+      fxCtx.arc(gx, gy, rr, 0, Math.PI * 2);
       fxCtx.fill();
     }
 
-    // stars
     fxCtx.globalCompositeOperation = "lighter";
-    for (const s of stars){
-      s.tw += (0.002 + 0.006*s.z) * dt;
-      const a = 0.25 + 0.75*(0.5 + 0.5*Math.sin(s.tw));
-      fxCtx.globalAlpha = a * (0.35 + 0.65*s.z);
+    for (const s of stars) {
+      s.tw += (0.002 + 0.006 * s.z) * dt;
+      const a = 0.25 + 0.75 * (0.5 + 0.5 * Math.sin(s.tw));
+      fxCtx.globalAlpha = a * (0.35 + 0.65 * s.z);
 
       fxCtx.beginPath();
-      fxCtx.arc(s.x + parX*s.z, s.y + parY*s.z, s.r, 0, Math.PI*2);
+      fxCtx.arc(s.x + parX * s.z, s.y + parY * s.z, s.r, 0, Math.PI * 2);
       fxCtx.fillStyle = `hsla(${s.hue}, 100%, 85%, 1)`;
       fxCtx.fill();
     }
     fxCtx.globalAlpha = 1;
 
-    // constellations
-    if (state.constellations){
+    if (state.constellations) {
       const maxLinks = state.eco ? 60 : 140;
       let links = 0;
       fxCtx.lineWidth = 1 * DPR;
-      for (let i=0; i<stars.length && links < maxLinks; i++){
+      for (let i = 0; i < stars.length && links < maxLinks; i++) {
         const a = stars[i];
-        for (let j=i+1; j<i+10 && j<stars.length; j++){
+        for (let j = i + 1; j < i + 10 && j < stars.length; j++) {
           const b = stars[j];
           const dx = (a.x - b.x);
           const dy = (a.y - b.y);
-          const d2 = dx*dx + dy*dy;
+          const d2 = dx * dx + dy * dy;
           const thresh = (state.eco ? 90 : 120) * DPR;
-          if (d2 < thresh*thresh){
-            const alpha = 0.14 * (1 - Math.sqrt(d2)/(thresh));
+          if (d2 < thresh * thresh) {
+            const alpha = 0.14 * (1 - Math.sqrt(d2) / (thresh));
             fxCtx.globalAlpha = alpha;
             fxCtx.strokeStyle = "rgba(255,255,255,1)";
             fxCtx.beginPath();
-            fxCtx.moveTo(a.x + parX*a.z, a.y + parY*a.z);
-            fxCtx.lineTo(b.x + parX*b.z, b.y + parY*b.z);
+            fxCtx.moveTo(a.x + parX * a.z, a.y + parY * a.z);
+            fxCtx.lineTo(b.x + parX * b.z, b.y + parY * b.z);
             fxCtx.stroke();
             links++;
           }
@@ -515,13 +541,12 @@
       fxCtx.globalAlpha = 1;
     }
 
-    // meteors
     spawnMeteor(false);
-    for (let i=meteors.length - 1; i>=0; i--){
+    for (let i = meteors.length - 1; i >= 0; i--) {
       const m = meteors[i];
-      m.life -= 0.012 * (dt/16);
-      m.x += m.vx * (dt/16);
-      m.y += m.vy * (dt/16);
+      m.life -= 0.012 * (dt / 16);
+      m.x += m.vx * (dt / 16);
+      m.y += m.vy * (dt / 16);
 
       const a = Math.max(0, m.life);
       fxCtx.globalAlpha = a;
@@ -530,7 +555,7 @@
       fxCtx.lineWidth = 2 * DPR;
       fxCtx.beginPath();
       fxCtx.moveTo(m.x, m.y);
-      fxCtx.lineTo(m.x - m.vx*0.8, m.y - m.vy*0.8);
+      fxCtx.lineTo(m.x - m.vx * 0.8, m.y - m.vy * 0.8);
       fxCtx.stroke();
 
       fxCtx.globalAlpha = a * 0.5;
@@ -538,17 +563,16 @@
       const mm = Math.max(0.0001, Math.hypot(m.vx, m.vy));
       fxCtx.beginPath();
       fxCtx.moveTo(m.x, m.y);
-      fxCtx.lineTo(m.x - (m.vx/mm)*m.len, m.y - (m.vy/mm)*m.len);
+      fxCtx.lineTo(m.x - (m.vx / mm) * m.len, m.y - (m.vy / mm) * m.len);
       fxCtx.stroke();
 
       fxCtx.globalAlpha = 1;
 
-      if (m.life <= 0 || m.x < -300 || m.x > W+300 || m.y > H+300) meteors.splice(i, 1);
+      if (m.life <= 0 || m.x < -300 || m.x > W + 300 || m.y > H + 300) meteors.splice(i, 1);
     }
 
-    // sparks
     fxCtx.globalCompositeOperation = "lighter";
-    for (let i = sparks.length - 1; i >= 0; i--){
+    for (let i = sparks.length - 1; i >= 0; i--) {
       const p = sparks[i];
       p.life -= 1;
       p.vx *= 0.985;
@@ -562,7 +586,7 @@
       fxCtx.globalAlpha = a;
 
       fxCtx.beginPath();
-      fxCtx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      fxCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       fxCtx.fillStyle = `hsla(${p.hue}, 100%, 70%, 1)`;
       fxCtx.fill();
 
@@ -579,7 +603,7 @@
     resizeAllCanvases();
   }, { passive: true });
 
-  // ===================== HEARTS STREAM (pooled + capped) =====================
+  // ===================== HEARTS STREAM =====================
   const COLORS = [
     "rgba(255,77,166,.95)",
     "rgba(255,45,85,.95)",
@@ -592,26 +616,26 @@
   let heartsAlive = 0;
   let heartTimer = null;
 
-  function heartCap(){
+  function heartCap() {
     if (!state.hearts) return 0;
     if (state.eco) return 20 + Math.floor(state.heartRate * 0.18);
     return 34 + Math.floor(state.heartRate * 0.22);
   }
 
-  function heartInterval(){
+  function heartInterval() {
     if (!state.hearts) return 999999;
     const r = state.heartRate / 100;
     return state.eco ? lerp(900, 220, r) : lerp(650, 160, r);
   }
 
-  function newHeartEl(){
+  function newHeartEl() {
     const h = document.createElement("div");
     h.className = "heart";
     heartField.appendChild(h);
     return h;
   }
-  function getHeartEl(){ return heartPool.pop() || newHeartEl(); }
-  function releaseHeartEl(h){
+  function getHeartEl() { return heartPool.pop() || newHeartEl(); }
+  function releaseHeartEl(h) {
     h.style.animation = "none";
     h.style.opacity = "0";
     // eslint-disable-next-line no-unused-expressions
@@ -640,19 +664,19 @@
     h.addEventListener("animationend", done);
   }
 
-  function refreshHearts(){
+  function refreshHearts() {
     if (heartTimer) clearInterval(heartTimer);
     heartTimer = setInterval(() => spawnHeart(), heartInterval());
   }
 
-  function seedHearts(){
+  function seedHearts() {
     const n = state.eco ? 12 : 22;
-    for (let k=0;k<n;k++){
-      spawnHeart({ xvw: Math.random()*100, size: rand(0.6, 1.9), t: rand(7, 15), drift: rand(-10, 10) });
+    for (let k = 0; k < n; k++) {
+      spawnHeart({ xvw: Math.random() * 100, size: rand(0.6, 1.9), t: rand(7, 15), drift: rand(-10, 10) });
     }
   }
 
-  function loveBurst(n = state.eco ? 80 : 130, xvw = 50){
+  function loveBurst(n = state.eco ? 80 : 130, xvw = 50) {
     if (!state.started) startExperience();
 
     for (let k = 0; k < n; k++) {
@@ -663,12 +687,12 @@
         drift: rand(-18, 18)
       });
     }
-    addSparks((xvw/100) * innerWidth, innerHeight * rand(0.35, 0.65), state.eco ? 44 : 74);
+    addSparks((xvw / 100) * innerWidth, innerHeight * rand(0.35, 0.65), state.eco ? 44 : 74);
   }
 
-  // ===================== DRAW SCREEN (phone-optimized) =====================
+  // ===================== DRAW SCREEN =====================
   const dctx = drawCanvas.getContext("2d", { alpha: true });
-  let drawW=0, drawH=0, drawDPR=1;
+  let drawW = 0, drawH = 0, drawDPR = 1;
 
   const palette = [
     "#ff4da6", "#ff2d55", "#7c4dff", "#2dfcff", "#ffd36e",
@@ -678,45 +702,43 @@
   let drawMode = "brush";
   let brushSize = parseInt(brushSizeEl.value, 10);
 
-  // undo stack (small, memory-safe)
   const undoStack = [];
   const UNDO_MAX = 12;
 
-  function pushUndo(){
-    try{
-      const img = dctx.getImageData(0,0,drawW,drawH);
+  function pushUndo() {
+    try {
+      const img = dctx.getImageData(0, 0, drawW, drawH);
       undoStack.push(img);
       if (undoStack.length > UNDO_MAX) undoStack.shift();
     } catch { /* ignore */ }
   }
 
-  function clearDraw(){
-    dctx.clearRect(0,0,drawW,drawH);
-    // soft background tint
-    const g = dctx.createLinearGradient(0,0,drawW,drawH);
+  function clearDraw() {
+    dctx.clearRect(0, 0, drawW, drawH);
+    const g = dctx.createLinearGradient(0, 0, drawW, drawH);
     g.addColorStop(0, "rgba(255,77,166,.06)");
     g.addColorStop(0.5, "rgba(124,77,255,.04)");
     g.addColorStop(1, "rgba(45,252,255,.05)");
     dctx.fillStyle = g;
-    dctx.fillRect(0,0,drawW,drawH);
+    dctx.fillRect(0, 0, drawW, drawH);
   }
 
-  function setActiveMode(btn){
-    modeButtons.forEach(b => b.classList.remove("active"));
+  function setActiveMode(btn) {
+    modeButtons.forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     drawMode = btn.dataset.mode;
   }
-  modeButtons.forEach(b => b.addEventListener("click", () => setActiveMode(b)));
+  modeButtons.forEach((b) => b.addEventListener("click", () => setActiveMode(b)));
 
-  function buildPalette(){
+  function buildPalette() {
     paletteEl.innerHTML = "";
     palette.forEach((c, idx) => {
       const s = document.createElement("div");
-      s.className = "swatch" + (idx===0 ? " active":"");
+      s.className = "swatch" + (idx === 0 ? " active" : "");
       s.style.background = c;
       s.addEventListener("click", () => {
         drawColor = c;
-        Array.from(paletteEl.children).forEach(ch => ch.classList.remove("active"));
+        Array.from(paletteEl.children).forEach((ch) => ch.classList.remove("active"));
         s.classList.add("active");
       });
       paletteEl.appendChild(s);
@@ -746,38 +768,78 @@
     a.click();
   });
 
-  // Drawing logic
   let drawing = false;
-  let lastX=0, lastY=0;
+  let lastX = 0, lastY = 0;
 
-  function normPos(e, canvas){
+  function normPos(e, canvas) {
     const r = canvas.getBoundingClientRect();
     const x = (e.clientX - r.left) * (canvas.width / r.width);
     const y = (e.clientY - r.top) * (canvas.height / r.height);
-    return {x,y};
+    return { x, y };
   }
 
-  function drawStroke(x1,y1,x2,y2){
-    if (drawMode === "heart" || drawMode === "star"){
-      // stamp along path
-      const steps = Math.max(1, Math.floor(dist(x1,y1,x2,y2) / (brushSize*0.9)));
-      for (let i=0;i<=steps;i++){
-        const t = i/steps;
-        const x = lerp(x1,x2,t);
-        const y = lerp(y1,y2,t);
-        if (drawMode === "heart") stampHeart(x,y);
-        else stampStar(x,y);
+  function stampHeart(x, y) {
+    const s = (brushSize * rand(0.7, 1.3)) * drawDPR;
+    dctx.save();
+    dctx.translate(x, y);
+    dctx.rotate(Math.PI / 4);
+    dctx.globalAlpha = 0.9;
+    dctx.fillStyle = withAlpha(drawColor, 0.9);
+    dctx.shadowBlur = 14 * drawDPR;
+    dctx.shadowColor = drawColor;
+
+    dctx.beginPath();
+    dctx.rect(-s / 2, -s / 2, s, s);
+    dctx.arc(-s / 2, 0, s / 2, 0, Math.PI * 2);
+    dctx.arc(0, -s / 2, s / 2, 0, Math.PI * 2);
+    dctx.fill();
+    dctx.restore();
+  }
+
+  function stampStar(x, y) {
+    const r = (brushSize * rand(0.9, 1.5)) * drawDPR;
+    const spikes = 5;
+    let rot = -Math.PI / 2;
+    let step = Math.PI / spikes;
+
+    dctx.save();
+    dctx.translate(x, y);
+    dctx.globalAlpha = 0.9;
+    dctx.fillStyle = withAlpha(drawColor, 0.9);
+    dctx.shadowBlur = 12 * drawDPR;
+    dctx.shadowColor = drawColor;
+
+    dctx.beginPath();
+    dctx.moveTo(0, -r);
+    for (let i = 0; i < spikes; i++) {
+      dctx.lineTo(Math.cos(rot + step) * (r * 0.45), Math.sin(rot + step) * (r * 0.45));
+      rot += step;
+      dctx.lineTo(Math.cos(rot + step) * r, Math.sin(rot + step) * r);
+      rot += step;
+    }
+    dctx.closePath();
+    dctx.fill();
+    dctx.restore();
+  }
+
+  function drawStroke(x1, y1, x2, y2) {
+    if (drawMode === "heart" || drawMode === "star") {
+      const steps = Math.max(1, Math.floor(dist(x1, y1, x2, y2) / (brushSize * 0.9)));
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const x = lerp(x1, x2, t);
+        const y = lerp(y1, y2, t);
+        if (drawMode === "heart") stampHeart(x, y);
+        else stampStar(x, y);
       }
       return;
     }
 
-    // brush/glow lines
     dctx.lineCap = "round";
     dctx.lineJoin = "round";
     dctx.lineWidth = brushSize * drawDPR;
-    dctx.strokeStyle = drawColor;
 
-    if (drawMode === "glow"){
+    if (drawMode === "glow") {
       dctx.shadowBlur = 18 * drawDPR;
       dctx.shadowColor = drawColor;
       dctx.globalAlpha = 0.95;
@@ -786,74 +848,26 @@
       dctx.globalAlpha = 0.95;
     }
 
-    // gradient stroke for "beautfiul colors"
-    const grad = dctx.createLinearGradient(x1,y1,x2,y2);
+    const grad = dctx.createLinearGradient(x1, y1, x2, y2);
     grad.addColorStop(0, withAlpha(drawColor, 0.95));
-    grad.addColorStop(1, withAlpha(palette[(Math.random()*palette.length)|0], 0.85));
+    grad.addColorStop(1, withAlpha(palette[(Math.random() * palette.length) | 0], 0.85));
     dctx.strokeStyle = grad;
 
     dctx.beginPath();
-    dctx.moveTo(x1,y1);
-    dctx.lineTo(x2,y2);
+    dctx.moveTo(x1, y1);
+    dctx.lineTo(x2, y2);
     dctx.stroke();
 
-    // small sparkles (cheap)
-    if (Math.random() < 0.12){
+    if (Math.random() < 0.12) {
       dctx.globalAlpha = 0.9;
       dctx.fillStyle = "rgba(255,255,255,.75)";
       dctx.beginPath();
-      dctx.arc(x2, y2, rand(1.2, 2.2)*drawDPR, 0, Math.PI*2);
+      dctx.arc(x2, y2, rand(1.2, 2.2) * drawDPR, 0, Math.PI * 2);
       dctx.fill();
     }
 
     dctx.shadowBlur = 0;
     dctx.globalAlpha = 1;
-  }
-
-  function stampHeart(x,y){
-    const s = (brushSize * rand(0.7, 1.3)) * drawDPR;
-    dctx.save();
-    dctx.translate(x,y);
-    dctx.rotate(Math.PI/4);
-    dctx.globalAlpha = 0.9;
-    dctx.fillStyle = withAlpha(drawColor, 0.9);
-    dctx.shadowBlur = 14 * drawDPR;
-    dctx.shadowColor = drawColor;
-
-    // heart via two circles + square (like CSS heart)
-    dctx.beginPath();
-    dctx.rect(-s/2, -s/2, s, s);
-    dctx.arc(-s/2, 0, s/2, 0, Math.PI*2);
-    dctx.arc(0, -s/2, s/2, 0, Math.PI*2);
-    dctx.fill();
-
-    dctx.restore();
-  }
-
-  function stampStar(x,y){
-    const r = (brushSize * rand(0.9, 1.5)) * drawDPR;
-    const spikes = 5;
-    let rot = -Math.PI / 2;
-    let step = Math.PI / spikes;
-
-    dctx.save();
-    dctx.translate(x,y);
-    dctx.globalAlpha = 0.9;
-    dctx.fillStyle = withAlpha(drawColor, 0.9);
-    dctx.shadowBlur = 12 * drawDPR;
-    dctx.shadowColor = drawColor;
-
-    dctx.beginPath();
-    dctx.moveTo(0, -r);
-    for (let i=0; i<spikes; i++){
-      dctx.lineTo(Math.cos(rot + step) * (r*0.45), Math.sin(rot + step) * (r*0.45));
-      rot += step;
-      dctx.lineTo(Math.cos(rot + step) * r, Math.sin(rot + step) * r);
-      rot += step;
-    }
-    dctx.closePath();
-    dctx.fill();
-    dctx.restore();
   }
 
   drawCanvas.addEventListener("pointerdown", (e) => {
@@ -869,23 +883,44 @@
   drawCanvas.addEventListener("pointermove", (e) => {
     if (!drawing) return;
     const p = normPos(e, drawCanvas);
-    drawStroke(lastX,lastY,p.x,p.y);
+    drawStroke(lastX, lastY, p.x, p.y);
     lastX = p.x; lastY = p.y;
   });
 
-  function endDraw(){
+  function endDraw() {
     if (!drawing) return;
     drawing = false;
     dctx.shadowBlur = 0;
     dctx.globalAlpha = 1;
     drawMsg.textContent = LOVE_LINES[(msgIndex + 1) % LOVE_LINES.length];
   }
+
   drawCanvas.addEventListener("pointerup", endDraw);
   drawCanvas.addEventListener("pointercancel", endDraw);
 
-  // ===================== FLAPPY VALENTINE (canvas) =====================
-  const gctx = gameCanvas.getContext("2d", { alpha: true });
-  let gW=0, gH=0, gDPR=1;
+  // ===================== FLAPPY VALENTINE (FIXED + HIGH SCORE) =====================
+  // High score stored in localStorage:
+  // - score = hearts passed
+  // - candy is separate
+  const HIGH_KEY = "valentine_flappy_highscore_v1";
+
+  // Create a High Score badge inside the existing score box (no HTML changes needed)
+  const highSpan = document.createElement("span");
+  highSpan.className = "scorelabel";
+  highSpan.textContent = "High:";
+  const highVal = document.createElement("span");
+  highVal.className = "score";
+  let highScore = safeLocalStorageGet(HIGH_KEY, 0);
+  highVal.textContent = String(highScore);
+  // Append to scorebox
+  const scorebox = document.querySelector(".scorebox");
+  if (scorebox) {
+    scorebox.appendChild(highSpan);
+    scorebox.appendChild(highVal);
+  }
+
+  const gctx2 = gameCanvas.getContext("2d", { alpha: true });
+  let gW = 0, gH = 0, gDPR = 1;
 
   const game = {
     running: false,
@@ -907,13 +942,24 @@
     candies: [],
     candySpeed: 2.6,
 
-    msgCooldown: 0,
     candyRush: 0
   };
 
-  function resetGame(){
+  let gameLoopRunning = false;
+
+  function updateHighScoreIfNeeded() {
+    if (game.score > highScore) {
+      highScore = game.score;
+      highVal.textContent = String(highScore);
+      safeLocalStorageSet(HIGH_KEY, highScore);
+    }
+  }
+
+  function resetGame() {
     game.running = false;
+    gameLoopRunning = false;
     game.paused = false;
+
     game.t = 0;
     game.score = 0;
     game.candy = 0;
@@ -928,29 +974,48 @@
 
     game.pipes = [];
     game.candies = [];
+
     game.pipeGap = (state.eco ? 160 : 150) * gDPR;
     game.pipeW = 58 * gDPR;
     game.pipeSpeed = (state.eco ? 2.2 : 2.6) * gDPR;
     game.candySpeed = game.pipeSpeed;
+
     game.candyRush = 0;
 
+    // overlay text
     overlay.classList.remove("hidden");
+    const tEl = overlay.querySelector(".overlay-title");
+    const sEl = overlay.querySelector(".overlay-sub");
+    if (tEl) tEl.textContent = "Tap to Start 💘";
+    if (sEl) sEl.textContent = "Tap to flap • Collect candy • Avoid the columns";
+
+    // draw once so it's not blank
+    drawGameFrame();
   }
 
-  function startGame(){
+  function ensureGameLoop() {
+    if (gameLoopRunning) return;
+    gameLoopRunning = true;
+    requestAnimationFrame(gameLoop);
+  }
+
+  function startGame() {
     if (!state.started) startExperience();
     overlay.classList.add("hidden");
     game.running = true;
     game.paused = false;
+    pauseBtn.textContent = "⏸ Pause";
+    ensureGameLoop();
   }
 
-  function togglePause(){
+  function togglePause() {
     if (!game.running) return;
     game.paused = !game.paused;
     pauseBtn.textContent = game.paused ? "▶ Resume" : "⏸ Pause";
+    if (!game.paused) ensureGameLoop();
   }
 
-  function spawnPipe(){
+  function spawnPipe() {
     const margin = 70 * gDPR;
     const gap = game.pipeGap;
     const topH = rand(margin, gH - margin - gap);
@@ -961,9 +1026,8 @@
       passed: false
     });
 
-    // spawn candy sometimes (more during candy rush)
     const candyChance = game.candyRush > 0 ? 0.9 : 0.45;
-    if (Math.random() < candyChance){
+    if (Math.random() < candyChance) {
       game.candies.push({
         x: gW + 40 * gDPR + game.pipeW * 0.5,
         y: topH + gap * rand(0.25, 0.75),
@@ -973,58 +1037,251 @@
     }
   }
 
-  function birdCollidesPipe(px, topH){
+  function birdCollidesPipe(px, topH) {
     const r = game.bird.r;
     const bx = game.bird.x;
     const by = game.bird.y;
     const w = game.pipeW;
     const gap = game.pipeGap;
 
-    // pipe rects
     const left = px;
     const right = px + w;
 
-    // bird circle vs axis-aligned rect collision (approx)
     if (bx + r < left || bx - r > right) return false;
-
-    // if bird is inside vertical gap it's safe
     if (by - r > topH && by + r < topH + gap) return false;
 
     return true;
   }
 
-  function birdCollidesCandy(c){
+  function birdCollidesCandy(c) {
     if (c.taken) return false;
     const dx = game.bird.x - c.x;
     const dy = game.bird.y - c.y;
     const rr = game.bird.r + c.r;
-    return (dx*dx + dy*dy) <= rr*rr;
+    return (dx * dx + dy * dy) <= rr * rr;
   }
 
-  function flap(){
+  function flap() {
     if (!game.running) startGame();
     if (game.paused) return;
+
     game.bird.vy = game.flap * gDPR;
+    ensureGameLoop();
   }
 
-  // controls
+  function endGame(reason = "") {
+    game.running = false;
+    gameLoopRunning = false;
+
+    updateHighScoreIfNeeded();
+
+    overlay.classList.remove("hidden");
+
+    const tEl = overlay.querySelector(".overlay-title");
+    const sEl = overlay.querySelector(".overlay-sub");
+
+    if (tEl) tEl.textContent = "Tap to Try Again 💘";
+
+    // Only show messages from LOVE_LINES (requirement)
+    if (sEl) sEl.textContent = LOVE_LINES[(msgIndex + 4) % LOVE_LINES.length];
+
+    // little sparkle where bird died
+    addSparks((game.bird.x / gDPR), (game.bird.y / gDPR), state.eco ? 22 : 34);
+
+    drawGameFrame();
+  }
+
+  // Controls (touch / click)
   gameCanvas.addEventListener("pointerup", (e) => {
     if (state.screen !== "game") return;
     e.preventDefault();
     flap();
   }, { passive: false });
 
-  startGameBtn.addEventListener("click", () => { showScreen("game"); startGame(); });
+  startGameBtn.addEventListener("click", () => { showScreen("game"); resetGame(); startGame(); });
   pauseBtn.addEventListener("click", togglePause);
-  restartBtn.addEventListener("click", () => { resetGame(); startGame(); });
+
+  restartBtn.addEventListener("click", () => {
+    resetGame();
+    startGame();
+  });
+
   megaCandyBtn.addEventListener("click", () => {
     if (!game.running) startGame();
-    game.candyRush = 900; // ~15s at 60fps
+    game.candyRush = 900;
     gameMsg.textContent = LOVE_LINES[(msgIndex + 3) % LOVE_LINES.length];
   });
 
+  overlay.addEventListener("pointerup", () => {
+    if (state.screen !== "game") showScreen("game");
+    resetGame();
+    startGame();
+  }, { passive: true });
+
+  // Render helpers
+  function drawHeartBird(x, y, r) {
+    gctx2.save();
+    gctx2.translate(x, y);
+    gctx2.scale(r / 20, r / 20);
+
+    const grad = gctx2.createLinearGradient(-20, -20, 20, 20);
+    grad.addColorStop(0, "rgba(255,77,166,1)");
+    grad.addColorStop(1, "rgba(124,77,255,0.95)");
+    gctx2.fillStyle = grad;
+
+    gctx2.beginPath();
+    gctx2.moveTo(0, 12);
+    gctx2.bezierCurveTo(18, -2, 16, -16, 0, -8);
+    gctx2.bezierCurveTo(-16, -16, -18, -2, 0, 12);
+    gctx2.closePath();
+    gctx2.shadowBlur = 18;
+    gctx2.shadowColor = "rgba(255,77,166,0.45)";
+    gctx2.fill();
+
+    gctx2.shadowBlur = 0;
+    gctx2.fillStyle = "rgba(255,255,255,0.9)";
+    gctx2.beginPath();
+    gctx2.arc(4, -3, 1.6, 0, Math.PI * 2);
+    gctx2.fill();
+
+    gctx2.restore();
+  }
+
+  function drawCandy(c) {
+    gctx2.save();
+    gctx2.translate(c.x, c.y);
+    gctx2.globalAlpha = 0.95;
+    gctx2.shadowBlur = 16 * gDPR;
+    gctx2.shadowColor = "rgba(255,211,110,0.35)";
+
+    const grad = gctx2.createLinearGradient(-c.r, -c.r, c.r, c.r);
+    grad.addColorStop(0, "rgba(255,211,110,1)");
+    grad.addColorStop(1, "rgba(255,77,166,0.9)");
+    gctx2.fillStyle = grad;
+
+    gctx2.beginPath();
+    gctx2.arc(0, 0, c.r, 0, Math.PI * 2);
+    gctx2.fill();
+
+    gctx2.shadowBlur = 0;
+    gctx2.strokeStyle = "rgba(255,255,255,0.65)";
+    gctx2.lineWidth = 2 * gDPR;
+    gctx2.beginPath();
+    gctx2.arc(0, 0, c.r * 0.65, 0, Math.PI * 2);
+    gctx2.stroke();
+
+    gctx2.restore();
+  }
+
+  function drawPipes(p) {
+    const x = p.x;
+    const w = game.pipeW;
+    const gap = game.pipeGap;
+
+    const g = gctx2.createLinearGradient(x, 0, x + w, 0);
+    g.addColorStop(0, "rgba(45,252,255,0.22)");
+    g.addColorStop(0.5, "rgba(255,77,166,0.18)");
+    g.addColorStop(1, "rgba(124,77,255,0.18)");
+
+    gctx2.fillStyle = gctx2.strokeStyle = g;
+    gctx2.globalAlpha = 1;
+
+    gctx2.fillRect(x, 0, w, p.topH);
+    const bottomY = p.topH + gap;
+    gctx2.fillRect(x, bottomY, w, gH - bottomY);
+
+    gctx2.strokeStyle = "rgba(255,255,255,0.22)";
+    gctx2.lineWidth = 2 * gDPR;
+    gctx2.strokeRect(x, 0, w, p.topH);
+    gctx2.strokeRect(x, bottomY, w, gH - bottomY);
+  }
+
+  function drawGameFrame() {
+    gctx2.clearRect(0, 0, gW, gH);
+
+    const bg = gctx2.createRadialGradient(gW * 0.4, gH * 0.3, 20, gW * 0.5, gH * 0.4, Math.max(gW, gH));
+    bg.addColorStop(0, "rgba(255,77,166,0.10)");
+    bg.addColorStop(0.5, "rgba(124,77,255,0.06)");
+    bg.addColorStop(1, "rgba(0,0,0,0)");
+    gctx2.fillStyle = bg;
+    gctx2.fillRect(0, 0, gW, gH);
+
+    for (const p of game.pipes) drawPipes(p);
+    for (const c of game.candies) drawCandy(c);
+    drawHeartBird(game.bird.x, game.bird.y, game.bird.r);
+  }
+
+  function gameLoop() {
+    if (!game.running) { gameLoopRunning = false; return; }
+    if (game.paused) { gameLoopRunning = false; return; }
+
+    game.t++;
+
+    // physics
+    game.bird.vy += game.gravity * gDPR;
+    game.bird.y += game.bird.vy;
+
+    // spawn pipes
+    const interval = state.eco ? 110 : 95;
+    if (game.t % interval === 0) spawnPipe();
+
+    // move pipes + score + collision
+    for (let i = game.pipes.length - 1; i >= 0; i--) {
+      const p = game.pipes[i];
+      p.x -= game.pipeSpeed;
+
+      if (!p.passed && p.x + game.pipeW < game.bird.x) {
+        p.passed = true;
+        game.score += 1;
+        scoreEl.textContent = String(game.score);
+
+        updateHighScoreIfNeeded();
+
+        if (game.score % 6 === 0) {
+          gameMsg.textContent = LOVE_LINES[((game.score / 6) | 0) % LOVE_LINES.length];
+        }
+      }
+
+      if (birdCollidesPipe(p.x, p.topH)) {
+        endGame("pipe");
+        return;
+      }
+
+      if (p.x + game.pipeW < -120 * gDPR) game.pipes.splice(i, 1);
+    }
+
+    // candies
+    for (let i = game.candies.length - 1; i >= 0; i--) {
+      const c = game.candies[i];
+      c.x -= game.candySpeed;
+
+      if (birdCollidesCandy(c)) {
+        c.taken = true;
+        game.candy += 1;
+        candyEl.textContent = String(game.candy);
+        addSparks((c.x / gDPR), (c.y / gDPR), state.eco ? 20 : 30);
+      }
+
+      if (c.x < -120 * gDPR || c.taken) game.candies.splice(i, 1);
+    }
+
+    // bounds
+    if (game.bird.y - game.bird.r < 0 || game.bird.y + game.bird.r > gH) {
+      endGame("bounds");
+      return;
+    }
+
+    // candy rush timer
+    if (game.candyRush > 0) game.candyRush--;
+
+    // draw
+    drawGameFrame();
+
+    requestAnimationFrame(gameLoop);
+  }
+
   // ===================== CANVAS RESIZE =====================
-  function resizeCanvasToElement(canvas){
+  function resizeCanvasToElement(canvas) {
     const r = canvas.getBoundingClientRect();
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     canvas.width = Math.max(1, Math.floor(r.width * dpr));
@@ -1032,7 +1289,7 @@
     return dpr;
   }
 
-  function resizeAllCanvases(){
+  function resizeAllCanvases() {
     // draw
     drawDPR = resizeCanvasToElement(drawCanvas);
     drawW = drawCanvas.width;
@@ -1043,245 +1300,30 @@
     gDPR = resizeCanvasToElement(gameCanvas);
     gW = gameCanvas.width;
     gH = gameCanvas.height;
+
     resetGame();
   }
 
-  // ===================== GAME RENDER =====================
-  function drawHeartBird(x,y,r){
-    // heart using two arcs + triangle-ish bottom
-    gctx.save();
-    gctx.translate(x,y);
-    gctx.scale(r/20, r/20);
-
-    gctx.globalAlpha = 1;
-    const grad = gctx.createLinearGradient(-20,-20,20,20);
-    grad.addColorStop(0, "rgba(255,77,166,1)");
-    grad.addColorStop(1, "rgba(124,77,255,0.95)");
-    gctx.fillStyle = grad;
-
-    gctx.beginPath();
-    gctx.moveTo(0, 12);
-    gctx.bezierCurveTo(18, -2, 16, -16, 0, -8);
-    gctx.bezierCurveTo(-16, -16, -18, -2, 0, 12);
-    gctx.closePath();
-    gctx.shadowBlur = 18;
-    gctx.shadowColor = "rgba(255,77,166,0.45)";
-    gctx.fill();
-
-    // tiny eye sparkle
-    gctx.shadowBlur = 0;
-    gctx.fillStyle = "rgba(255,255,255,0.9)";
-    gctx.beginPath();
-    gctx.arc(4, -3, 1.6, 0, Math.PI*2);
-    gctx.fill();
-
-    gctx.restore();
-  }
-
-  function drawCandy(c){
-    gctx.save();
-    gctx.translate(c.x, c.y);
-    gctx.globalAlpha = 0.95;
-    gctx.shadowBlur = 16 * gDPR;
-    gctx.shadowColor = "rgba(255,211,110,0.35)";
-
-    const grad = gctx.createLinearGradient(-c.r,-c.r,c.r,c.r);
-    grad.addColorStop(0, "rgba(255,211,110,1)");
-    grad.addColorStop(1, "rgba(255,77,166,0.9)");
-    gctx.fillStyle = grad;
-
-    // candy swirl circle
-    gctx.beginPath();
-    gctx.arc(0,0,c.r,0,Math.PI*2);
-    gctx.fill();
-
-    gctx.shadowBlur = 0;
-    gctx.strokeStyle = "rgba(255,255,255,0.65)";
-    gctx.lineWidth = 2 * gDPR;
-    gctx.beginPath();
-    gctx.arc(0,0,c.r*0.65,0,Math.PI*2);
-    gctx.stroke();
-
-    gctx.restore();
-  }
-
-  function drawPipes(p){
-    const x = p.x;
-    const w = game.pipeW;
-    const gap = game.pipeGap;
-
-    // pipe gradient
-    const g = gctx.createLinearGradient(x,0,x+w,0);
-    g.addColorStop(0, "rgba(45,252,255,0.22)");
-    g.addColorStop(0.5, "rgba(255,77,166,0.18)");
-    g.addColorStop(1, "rgba(124,77,255,0.18)");
-
-    gctx.fillStyle = g;
-    gctx.globalAlpha = 1;
-
-    // top column
-    gctx.fillRect(x, 0, w, p.topH);
-    // bottom column
-    const bottomY = p.topH + gap;
-    gctx.fillRect(x, bottomY, w, gH - bottomY);
-
-    // glowing edges
-    gctx.strokeStyle = "rgba(255,255,255,0.22)";
-    gctx.lineWidth = 2 * gDPR;
-    gctx.strokeRect(x, 0, w, p.topH);
-    gctx.strokeRect(x, bottomY, w, gH - bottomY);
-  }
-
-  function gameLoop(){
-    if (!game.running) return;
-
-    if (game.paused){
-      requestAnimationFrame(gameLoop);
-      return;
-    }
-
-    game.t++;
-
-    // background fade (transparent; relies on card)
-    gctx.clearRect(0,0,gW,gH);
-
-    // subtle moving backdrop in game canvas
-    const bg = gctx.createRadialGradient(gW*0.4,gH*0.3, 20, gW*0.5,gH*0.4, Math.max(gW,gH));
-    bg.addColorStop(0, "rgba(255,77,166,0.10)");
-    bg.addColorStop(0.5, "rgba(124,77,255,0.06)");
-    bg.addColorStop(1, "rgba(0,0,0,0)");
-    gctx.fillStyle = bg;
-    gctx.fillRect(0,0,gW,gH);
-
-    // physics
-    game.bird.vy += game.gravity * gDPR;
-    game.bird.y += game.bird.vy;
-
-    // spawn pipes
-    const interval = state.eco ? 110 : 95;
-    if (game.t % interval === 0) spawnPipe();
-
-    // move pipes + score
-    for (let i=game.pipes.length-1; i>=0; i--){
-      const p = game.pipes[i];
-      p.x -= game.pipeSpeed;
-
-      // passed
-      if (!p.passed && p.x + game.pipeW < game.bird.x){
-        p.passed = true;
-        game.score += 1;
-        scoreEl.textContent = String(game.score);
-
-        // “not too extra” message, but ONLY from list:
-        if (game.score % 6 === 0) {
-          gameMsg.textContent = LOVE_LINES[(game.score/6 | 0) % LOVE_LINES.length];
-        }
-      }
-
-      // collision
-      if (birdCollidesPipe(p.x, p.topH)){
-        endGame();
-        return;
-      }
-
-      // cleanup
-      if (p.x + game.pipeW < -120 * gDPR) game.pipes.splice(i, 1);
-    }
-
-    // candies
-    for (let i=game.candies.length-1; i>=0; i--){
-      const c = game.candies[i];
-      c.x -= game.candySpeed;
-      if (birdCollidesCandy(c)){
-        c.taken = true;
-        game.candy += 1;
-        candyEl.textContent = String(game.candy);
-        // mini sparkle
-        addSparks((c.x / gDPR), (c.y / gDPR), state.eco ? 20 : 30);
-      }
-      if (c.x < -120 * gDPR || c.taken) game.candies.splice(i, 1);
-    }
-
-    // bounds
-    if (game.bird.y - game.bird.r < 0 || game.bird.y + game.bird.r > gH){
-      endGame();
-      return;
-    }
-
-    // draw
-    for (const p of game.pipes) drawPipes(p);
-    for (const c of game.candies) drawCandy(c);
-    drawHeartBird(game.bird.x, game.bird.y, game.bird.r);
-
-    // candy rush timer
-    if (game.candyRush > 0) game.candyRush--;
-
-    requestAnimationFrame(gameLoop);
-  }
-
-  function endGame(){
-    game.running = false;
-    overlay.classList.remove("hidden");
-    overlay.querySelector(".overlay-title").textContent = "Tap to Try Again 💘";
-    overlay.querySelector(".overlay-sub").textContent = LOVE_LINES[(msgIndex + 4) % LOVE_LINES.length];
-  }
-
-  // ===================== DRAW / GAME SCREEN BUTTON HELPERS =====================
-  function resizeAfterNav(){
-    // ensure canvases match layout after switching
+  // ===================== SCREEN SWITCH SIDE EFFECTS =====================
+  function resizeAfterNav() {
     setTimeout(resizeAllCanvases, 40);
   }
 
-  // ===================== SCREEN SWITCH SIDE EFFECTS =====================
-  // pause the game when leaving the game screen
-  function onScreenChanged(){
+  function onScreenChanged() {
     setActiveNav();
     if (state.screen !== "game" && game.running) {
       game.paused = true;
       pauseBtn.textContent = "▶ Resume";
+      gameLoopRunning = false;
     }
     resizeAfterNav();
   }
 
-  // wrap showScreen to include side effects
   const _showScreen = showScreen;
-  showScreen = function(name){
+  showScreen = function (name) {
     _showScreen(name);
     onScreenChanged();
   };
-
-  // ===================== GAME BUTTONS =====================
-  pauseBtn.addEventListener("click", () => {
-    togglePause();
-    if (game.running && !game.paused) requestAnimationFrame(gameLoop);
-  });
-
-  restartBtn.addEventListener("click", () => {
-    resetGame();
-    startGame();
-    requestAnimationFrame(gameLoop);
-  });
-
-  // Start on overlay tap too
-  overlay.addEventListener("pointerup", () => {
-    if (state.screen !== "game") showScreen("game");
-    resetGame();
-    startGame();
-    requestAnimationFrame(gameLoop);
-  }, { passive: true });
-
-  // ===================== HELPERS =====================
-  function rand(a,b){ return a + Math.random()*(b-a); }
-  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
-  function lerp(a,b,t){ return a + (b-a)*t; }
-  function dist(x1,y1,x2,y2){ return Math.hypot(x2-x1, y2-y1); }
-  function withAlpha(hex, a){
-    // hex like #rrggbb
-    const r = parseInt(hex.slice(1,3),16);
-    const g = parseInt(hex.slice(3,5),16);
-    const b = parseInt(hex.slice(5,7),16);
-    return `rgba(${r},${g},${b},${a})`;
-  }
 
   // ===================== BOOT =====================
   resizeFX();
@@ -1290,17 +1332,16 @@
   refreshHearts();
   seedHearts();
 
-  // initial canvases once visible
   resizeAllCanvases();
 
-  // default draw footer message
   drawMsg.textContent = LOVE_LINES[1];
   gameMsg.textContent = LOVE_LINES[2];
 
   // Start experience if user clicks nav early
-  [toLove,toDraw,toGame].forEach(btn => btn.addEventListener("click", startExperience, { once: true }));
+  [toLove, toDraw, toGame].forEach((btn) =>
+    btn.addEventListener("click", startExperience, { once: true })
+  );
 
-  // Ensure nav shows Love at start
   showScreen("love");
 
 })();
