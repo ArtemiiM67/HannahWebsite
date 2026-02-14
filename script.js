@@ -55,7 +55,7 @@
   const saveBtn = document.getElementById("saveBtn");
   const modeButtons = Array.from(document.querySelectorAll(".chipbtn"));
 
-  // Games
+  // Games UI
   const tabFlappy = document.getElementById("tabFlappy");
   const tabCatch = document.getElementById("tabCatch");
   const tabMemory = document.getElementById("tabMemory");
@@ -75,7 +75,7 @@
   const megaCandyBtn = document.getElementById("megaCandyBtn");
   const gameMsg = document.getElementById("gameMsg");
 
-  // Memory
+  // Memory (DOM)
   const memoryWrap = document.getElementById("memoryWrap");
   const memoryGrid = document.getElementById("memoryGrid");
   const memoryNew = document.getElementById("memoryNew");
@@ -463,7 +463,6 @@
     const parX = tiltX * 18 * DPR;
     const parY = tiltY * 12 * DPR;
 
-    // wisps
     fxCtx.globalCompositeOperation = "lighter";
     for (const w of wisps) {
       w.ph += 0.0016 * dt;
@@ -492,7 +491,6 @@
       fxCtx.fill();
     }
 
-    // stars
     fxCtx.globalCompositeOperation = "lighter";
     for (const s of stars) {
       s.tw += (0.002 + 0.006 * s.z) * dt;
@@ -505,7 +503,6 @@
     }
     fxCtx.globalAlpha = 1;
 
-    // constellations
     if (state.constellations) {
       const maxLinks = state.eco ? 55 : 120;
       let links = 0;
@@ -533,7 +530,6 @@
       fxCtx.globalAlpha = 1;
     }
 
-    // meteors
     spawnMeteor(false);
     for (let i = meteors.length - 1; i >= 0; i--) {
       const m = meteors[i];
@@ -563,7 +559,6 @@
       if (m.life <= 0 || m.x < -300 || m.x > W + 300 || m.y > H + 300) meteors.splice(i, 1);
     }
 
-    // sparks
     fxCtx.globalCompositeOperation = "lighter";
     for (let i = sparks.length - 1; i >= 0; i--) {
       const p = sparks[i];
@@ -874,21 +869,15 @@
   const gctx = gameCanvas.getContext("2d", { alpha: true });
   let gW = 0, gH = 0, gDPR = 1;
 
-  const GAME = {
-    FLAPPY: "flappy",
-    CATCH: "catch",
-    MEMORY: "memory",
-    POP: "pop",
-    PONG: "pong"
-  };
+  const GAME = { FLAPPY:"flappy", CATCH:"catch", MEMORY:"memory", POP:"pop", PONG:"pong" };
   let activeGame = GAME.FLAPPY;
 
   const HIGH_KEYS = {
-    [GAME.FLAPPY]: "valentine_high_flappy_v2",
-    [GAME.CATCH]: "valentine_high_catch_v2",
-    [GAME.MEMORY]: "valentine_best_memory_v2",   // lower is better
-    [GAME.POP]: "valentine_high_pop_v2",
-    [GAME.PONG]: "valentine_high_pong_v2"
+    [GAME.FLAPPY]: "valentine_high_flappy_v3",
+    [GAME.CATCH]: "valentine_high_catch_v3",
+    [GAME.MEMORY]: "valentine_best_memory_v3",
+    [GAME.POP]: "valentine_high_pop_v3",
+    [GAME.PONG]: "valentine_high_pong_v3"
   };
 
   function loadHigh() {
@@ -904,36 +893,25 @@
   function setTabs() {
     const all = [tabFlappy, tabCatch, tabMemory, tabPop, tabPong];
     all.forEach(b => b.classList.remove("active"));
-    const map = {
-      [GAME.FLAPPY]: tabFlappy,
-      [GAME.CATCH]: tabCatch,
-      [GAME.MEMORY]: tabMemory,
-      [GAME.POP]: tabPop,
-      [GAME.PONG]: tabPong
-    };
+    const map = { [GAME.FLAPPY]:tabFlappy,[GAME.CATCH]:tabCatch,[GAME.MEMORY]:tabMemory,[GAME.POP]:tabPop,[GAME.PONG]:tabPong };
     map[activeGame].classList.add("active");
     all.forEach(b => b.setAttribute("aria-selected", b.classList.contains("active") ? "true" : "false"));
 
-    // show memory DOM only when memory
     memoryWrap.classList.toggle("hidden", activeGame !== GAME.MEMORY);
     gameCanvas.style.visibility = (activeGame === GAME.MEMORY) ? "hidden" : "visible";
-
-    // show Candy Rush only for flappy
     megaCandyBtn.style.display = (activeGame === GAME.FLAPPY) ? "inline-flex" : "none";
 
-    // relabel score fields per game
-    if (activeGame === GAME.FLAPPY) { labelA.textContent = "Hearts:"; labelB.textContent = "Candy:"; }
-    if (activeGame === GAME.CATCH)  { labelA.textContent = "Caught:"; labelB.textContent = "Miss:"; }
-    if (activeGame === GAME.MEMORY) { labelA.textContent = "Pairs:";  labelB.textContent = "Moves:"; }
-    if (activeGame === GAME.POP)    { labelA.textContent = "Pops:";   labelB.textContent = "Time:"; }
-    if (activeGame === GAME.PONG)   { labelA.textContent = "Rally:";  labelB.textContent = "Lives:"; }
+    if (activeGame === GAME.FLAPPY) { labelA.textContent="Hearts:"; labelB.textContent="Candy:"; }
+    if (activeGame === GAME.CATCH)  { labelA.textContent="Caught:"; labelB.textContent="Miss:"; }
+    if (activeGame === GAME.MEMORY) { labelA.textContent="Pairs:";  labelB.textContent="Moves:"; }
+    if (activeGame === GAME.POP)    { labelA.textContent="Pops:";   labelB.textContent="Time:"; }
+    if (activeGame === GAME.PONG)   { labelA.textContent="Rally:";  labelB.textContent="Lives:"; }
 
-    // overlay text
     const tEl = overlay.querySelector(".overlay-title");
     const sEl = overlay.querySelector(".overlay-sub");
     if (tEl) tEl.textContent = "Tap to Start 💘";
     if (sEl) {
-      if (activeGame === GAME.FLAPPY) sEl.textContent = "Tap to flap • Collect candy • Avoid the columns";
+      if (activeGame === GAME.FLAPPY) sEl.textContent = "Tap to flap • Now floatier + slower 💘";
       if (activeGame === GAME.CATCH)  sEl.textContent = "Drag the basket • Catch hearts • Avoid 💔";
       if (activeGame === GAME.MEMORY) sEl.textContent = "Tap cards • Match pairs • Fewer moves = better 💘";
       if (activeGame === GAME.POP)    sEl.textContent = "Tap hearts to pop • 30 seconds • Beat your high 💘";
@@ -944,54 +922,76 @@
   }
 
   // ===================== GAME STATES =====================
+  // ✅ IMPORTANT: Flappy now uses delta-time so 120Hz/144Hz doesn't make it fall instantly.
   const flappy = {
-    running: false, paused: false, t: 0,
-    score: 0, candy: 0,
-    bird: { x: 0, y: 0, vy: 0, r: 16 },
-    gravity: 0.55, flap: -8.4,
-    pipes: [], pipeGap: 150, pipeW: 58, pipeSpeed: 2.6,
-    candies: [], candySpeed: 2.6,
-    candyRush: 0
+    running:false, paused:false,
+    score:0, candy:0,
+
+    bird:{ x:0, y:0, vy:0, r:16 },
+
+    // floatier + slower (base units are "per 60fps frame" but we apply dt scaling)
+    gravity: 0.12,        // weaker gravity
+    flap: -5.4,           // gentler flap
+    termV: 5.9,           // terminal velocity cap
+
+    pipes: [],
+    pipeGap: 170,
+    pipeW: 58,
+    pipeSpeed: 1.55,      // slower scroll
+
+    candies: [],
+    candySpeed: 1.55,
+
+    candyRush: 0,
+
+    // dt timers
+    pipeTimer: 0,
+    pipeEvery: 1320,      // ms between pipes (slower)
   };
 
   const catchGame = {
-    running: false, paused: false, t: 0,
-    score: 0, misses: 0,
-    basket: { x: 0, y: 0, w: 110, h: 28 },
-    fall: [] // {x,y,vy,type:'heart'|'bad',r}
+    running:false, paused:false,
+    score:0, misses:0,
+    basket:{ x:0, y:0, w:110, h:28 },
+    fall:[],
+    spawnTimer:0
   };
 
   const popGame = {
-    running: false, paused: false,
-    score: 0,
-    timeLeft: 30.0, // seconds
-    hearts: [] // {x,y,r,vx,vy,life}
+    running:false, paused:false,
+    score:0,
+    timeLeft:30.0,
+    hearts:[],
+    spawnTimer:0
   };
 
   const pongGame = {
-    running: false, paused: false,
-    rally: 0,
-    lives: 3,
-    paddle: { x: 0, y: 0, w: 130, h: 18 },
-    ball: { x: 0, y: 0, vx: 0, vy: 0, r: 14 }
+    running:false, paused:false,
+    rally:0, lives:3,
+    paddle:{ x:0, y:0, w:130, h:18 },
+    ball:{ x:0, y:0, vx:0, vy:0, r:14 }
   };
 
   // ===================== DIFFICULTY SYNC =====================
   function syncDifficulty() {
-    // flappy
-    flappy.pipeGap = (state.eco ? 160 : 150) * gDPR;
-    flappy.pipeSpeed = (state.eco ? 2.2 : 2.6) * gDPR;
-    flappy.candySpeed = flappy.pipeSpeed;
+    // Flappy scales with DPR, dt handles refresh rate
+    flappy.pipeGap = (state.eco ? 190 : 175) * gDPR;
     flappy.pipeW = 58 * gDPR;
+    flappy.pipeSpeed = (state.eco ? 1.45 : 1.55) * gDPR;
+    flappy.candySpeed = flappy.pipeSpeed;
     flappy.bird.r = 16 * gDPR;
 
-    // catch
+    // “per 60fps frame” units scaled by DPR; dt factor later
+    flappy._g = flappy.gravity * gDPR;
+    flappy._flap = flappy.flap * gDPR;
+    flappy._term = flappy.termV * gDPR;
+
+    // pipe spacing (ms)
+    flappy.pipeEvery = state.eco ? 1400 : 1320;
+
     catchGame.basket.w = (state.eco ? 128 : 118) * gDPR;
     catchGame.basket.h = 28 * gDPR;
 
-    // pop
-    // (eco just spawns fewer hearts)
-    // pong
     pongGame.paddle.w = (state.eco ? 140 : 130) * gDPR;
     pongGame.paddle.h = 18 * gDPR;
     pongGame.ball.r = 14 * gDPR;
@@ -999,55 +999,55 @@
 
   // ===================== RESET / START / END =====================
   function resetFlappy() {
-    flappy.running = false; flappy.paused = false; flappy.t = 0;
-    flappy.score = 0; flappy.candy = 0;
+    flappy.running=false; flappy.paused=false;
+    flappy.score=0; flappy.candy=0;
+    scoreEl.textContent="0"; candyEl.textContent="0";
+
     flappy.bird.x = gW * 0.28;
     flappy.bird.y = gH * 0.48;
     flappy.bird.vy = 0;
-    flappy.pipes = [];
-    flappy.candies = [];
-    flappy.candyRush = 0;
+
+    flappy.pipes=[]; flappy.candies=[];
+    flappy.candyRush=0;
+    flappy.pipeTimer=0;
+
+    overlay.classList.remove("hidden");
+    pauseBtn.textContent="⏸ Pause";
   }
 
-  function resetCatch() {
-    catchGame.running = false; catchGame.paused = false; catchGame.t = 0;
-    catchGame.score = 0; catchGame.misses = 0;
-    catchGame.basket.x = gW * 0.5;
-    catchGame.basket.y = gH * 0.86;
-    catchGame.fall = [];
+  function resetCatch(){
+    catchGame.running=false; catchGame.paused=false;
+    catchGame.score=0; catchGame.misses=0;
+    scoreEl.textContent="0"; candyEl.textContent="0";
+    catchGame.basket.x=gW*0.5; catchGame.basket.y=gH*0.86;
+    catchGame.fall=[]; catchGame.spawnTimer=0;
+    overlay.classList.remove("hidden");
+    pauseBtn.textContent="⏸ Pause";
   }
 
-  function resetPop() {
-    popGame.running = false; popGame.paused = false;
-    popGame.score = 0;
-    popGame.timeLeft = 30.0;
-    popGame.hearts = [];
+  function resetPop(){
+    popGame.running=false; popGame.paused=false;
+    popGame.score=0; popGame.timeLeft=30.0;
+    scoreEl.textContent="0"; candyEl.textContent=popGame.timeLeft.toFixed(1);
+    popGame.hearts=[]; popGame.spawnTimer=0;
+    overlay.classList.remove("hidden");
+    pauseBtn.textContent="⏸ Pause";
   }
 
-  function resetPong() {
-    pongGame.running = false; pongGame.paused = false;
-    pongGame.rally = 0;
-    pongGame.lives = 3;
-    pongGame.paddle.x = gW * 0.5;
-    pongGame.paddle.y = gH * 0.86;
-    pongGame.ball.x = gW * 0.5;
-    pongGame.ball.y = gH * 0.45;
-    const sp = (state.eco ? 4.3 : 4.9) * gDPR;
-    pongGame.ball.vx = (Math.random() < 0.5 ? -1 : 1) * sp;
-    pongGame.ball.vy = sp * 0.9;
+  function resetPong(){
+    pongGame.running=false; pongGame.paused=false;
+    pongGame.rally=0; pongGame.lives=3;
+    scoreEl.textContent="0"; candyEl.textContent="3";
+    pongGame.paddle.x=gW*0.5; pongGame.paddle.y=gH*0.86;
+    pongResetBall();
+    overlay.classList.remove("hidden");
+    pauseBtn.textContent="⏸ Pause";
   }
 
   function resetMemory() {
     memoryState = makeMemoryRound();
     renderMemory();
-  }
-
-  function resetActiveGameUI() {
-    if (activeGame === GAME.FLAPPY) { scoreEl.textContent = "0"; candyEl.textContent = "0"; }
-    if (activeGame === GAME.CATCH)  { scoreEl.textContent = "0"; candyEl.textContent = "0"; }
-    if (activeGame === GAME.MEMORY) { scoreEl.textContent = "0"; candyEl.textContent = "0"; }
-    if (activeGame === GAME.POP)    { scoreEl.textContent = "0"; candyEl.textContent = "30.0"; }
-    if (activeGame === GAME.PONG)   { scoreEl.textContent = "0"; candyEl.textContent = "3"; }
+    overlay.classList.add("hidden"); // memory is always “running”
   }
 
   function resetActiveGame() {
@@ -1061,91 +1061,80 @@
     if (activeGame === GAME.PONG)   resetPong();
     if (activeGame === GAME.MEMORY) resetMemory();
 
-    resetActiveGameUI();
     loadHigh();
   }
 
   function startActiveGame() {
     if (!state.started) startExperience();
     overlay.classList.add("hidden");
+
     if (activeGame === GAME.FLAPPY) flappy.running = true;
     if (activeGame === GAME.CATCH)  catchGame.running = true;
     if (activeGame === GAME.POP)    popGame.running = true;
     if (activeGame === GAME.PONG)   pongGame.running = true;
 
-    // memory starts immediately (no loop)
-    if (activeGame === GAME.MEMORY) {
-      overlay.classList.add("hidden");
-    } else {
-      ensureLoop();
-    }
+    if (activeGame !== GAME.MEMORY) ensureLoop();
   }
 
   function togglePause() {
-    if (activeGame === GAME.MEMORY) return; // no RAF
-    const running =
+    if (activeGame === GAME.MEMORY) return;
+
+    const isRunning =
       (activeGame === GAME.FLAPPY && flappy.running) ||
       (activeGame === GAME.CATCH && catchGame.running) ||
       (activeGame === GAME.POP && popGame.running) ||
       (activeGame === GAME.PONG && pongGame.running);
 
-    if (!running) return;
+    if (!isRunning) return;
 
-    const paused =
+    let paused =
       (activeGame === GAME.FLAPPY && flappy.paused) ||
       (activeGame === GAME.CATCH && catchGame.paused) ||
       (activeGame === GAME.POP && popGame.paused) ||
       (activeGame === GAME.PONG && pongGame.paused);
 
-    const newPaused = !paused;
+    paused = !paused;
 
-    if (activeGame === GAME.FLAPPY) flappy.paused = newPaused;
-    if (activeGame === GAME.CATCH)  catchGame.paused = newPaused;
-    if (activeGame === GAME.POP)    popGame.paused = newPaused;
-    if (activeGame === GAME.PONG)   pongGame.paused = newPaused;
+    if (activeGame === GAME.FLAPPY) flappy.paused = paused;
+    if (activeGame === GAME.CATCH)  catchGame.paused = paused;
+    if (activeGame === GAME.POP)    popGame.paused = paused;
+    if (activeGame === GAME.PONG)   pongGame.paused = paused;
 
-    pauseBtn.textContent = newPaused ? "▶ Resume" : "⏸ Pause";
-    if (!newPaused) ensureLoop();
+    pauseBtn.textContent = paused ? "▶ Resume" : "⏸ Pause";
+    if (!paused) ensureLoop();
   }
 
-  function endActiveGame(reasonLineIndex = 4) {
-    // update highs
+  function endActiveGame(lineIdx = 4) {
     if (activeGame === GAME.FLAPPY) {
       const high = safeGet(HIGH_KEYS[GAME.FLAPPY], 0);
-      if (flappy.score > high) { saveHigh(flappy.score); }
+      if (flappy.score > high) safeSet(HIGH_KEYS[GAME.FLAPPY], flappy.score);
+      flappy.running = false;
     }
     if (activeGame === GAME.CATCH) {
       const high = safeGet(HIGH_KEYS[GAME.CATCH], 0);
-      if (catchGame.score > high) { saveHigh(catchGame.score); }
+      if (catchGame.score > high) safeSet(HIGH_KEYS[GAME.CATCH], catchGame.score);
+      catchGame.running = false;
     }
     if (activeGame === GAME.POP) {
       const high = safeGet(HIGH_KEYS[GAME.POP], 0);
-      if (popGame.score > high) { saveHigh(popGame.score); }
+      if (popGame.score > high) safeSet(HIGH_KEYS[GAME.POP], popGame.score);
+      popGame.running = false;
     }
     if (activeGame === GAME.PONG) {
       const high = safeGet(HIGH_KEYS[GAME.PONG], 0);
-      if (pongGame.rally > high) { saveHigh(pongGame.rally); }
+      if (pongGame.rally > high) safeSet(HIGH_KEYS[GAME.PONG], pongGame.rally);
+      pongGame.running = false;
     }
-
-    // stop loops
-    if (activeGame === GAME.FLAPPY) flappy.running = false;
-    if (activeGame === GAME.CATCH)  catchGame.running = false;
-    if (activeGame === GAME.POP)    popGame.running = false;
-    if (activeGame === GAME.PONG)   pongGame.running = false;
 
     overlay.classList.remove("hidden");
     overlay.querySelector(".overlay-title").textContent = "Tap to Try Again 💘";
-    overlay.querySelector(".overlay-sub").textContent = LOVE_LINES[reasonLineIndex % LOVE_LINES.length];
+    overlay.querySelector(".overlay-sub").textContent = LOVE_LINES[lineIdx % LOVE_LINES.length];
     loadHigh();
+    stopLoop();
   }
 
   // ===================== GAME SWITCH =====================
-  function switchGame(name) {
-    activeGame = name;
-    setTabs();
-    resetActiveGame();
-  }
-
+  function switchGame(name) { activeGame = name; setTabs(); resetActiveGame(); }
   tabFlappy.addEventListener("click", () => switchGame(GAME.FLAPPY));
   tabCatch.addEventListener("click", () => switchGame(GAME.CATCH));
   tabMemory.addEventListener("click", () => switchGame(GAME.MEMORY));
@@ -1154,13 +1143,12 @@
 
   // ===================== FLAPPY HELPERS =====================
   function spawnPipe() {
-    const margin = 70 * gDPR;
+    const margin = 86 * gDPR;
     const gap = flappy.pipeGap;
     const topH = rand(margin, gH - margin - gap);
 
     flappy.pipes.push({ x: gW + 40 * gDPR, topH, passed: false });
 
-    // spawn candy sometimes
     const candyChance = flappy.candyRush > 0 ? 0.9 : 0.45;
     if (Math.random() < candyChance) {
       flappy.candies.push({
@@ -1197,10 +1185,10 @@
   function flappyFlap() {
     if (!flappy.running) startActiveGame();
     if (flappy.paused) return;
-    flappy.bird.vy = flappy.flap * gDPR;
+    flappy.bird.vy = flappy._flap;
   }
 
-  // ===================== CATCH HELPERS =====================
+  // ===================== OTHER GAME HELPERS =====================
   function spawnFalling() {
     const isBad = Math.random() < (state.eco ? 0.18 : 0.22);
     const r = (isBad ? 16 : 15) * gDPR;
@@ -1213,21 +1201,19 @@
   }
 
   function catchHit(f, bx, by, bw, bh) {
-    // circle vs rect
     const cx = clamp(f.x, bx - bw / 2, bx + bw / 2);
     const cy = clamp(f.y, by - bh / 2, by + bh / 2);
     const dx = f.x - cx, dy = f.y - cy;
     return dx * dx + dy * dy <= f.r * f.r;
   }
 
-  // ===================== POP HELPERS =====================
   function spawnPopHeart() {
     const r = rand(16, 28) * gDPR;
     const x = rand(r + 8 * gDPR, gW - r - 8 * gDPR);
     const y = rand(r + 8 * gDPR, gH - r - 8 * gDPR);
     const vx = rand(-1.2, 1.2) * gDPR;
     const vy = rand(-1.1, 1.1) * gDPR;
-    const life = rand(1.2, 2.2); // seconds
+    const life = rand(1.0, 2.0);
     popGame.hearts.push({ x, y, r, vx, vy, life });
     const cap = state.eco ? 10 : 16;
     if (popGame.hearts.length > cap) popGame.hearts.shift();
@@ -1239,7 +1225,6 @@
     return (dx * dx + dy * dy) <= (h.r * h.r);
   }
 
-  // ===================== PONG HELPERS =====================
   function pongResetBall() {
     pongGame.ball.x = gW * 0.5;
     pongGame.ball.y = gH * 0.45;
@@ -1248,7 +1233,17 @@
     pongGame.ball.vy = sp * 0.9;
   }
 
-  // ===================== DRAWING GAME RENDER PRIMITIVES =====================
+  // ===================== RENDER PRIMITIVES =====================
+  function drawGameBackground() {
+    gctx.clearRect(0, 0, gW, gH);
+    const bg = gctx.createRadialGradient(gW * 0.4, gH * 0.3, 20, gW * 0.5, gH * 0.4, Math.max(gW, gH));
+    bg.addColorStop(0, "rgba(255,77,166,0.10)");
+    bg.addColorStop(0.5, "rgba(124,77,255,0.06)");
+    bg.addColorStop(1, "rgba(0,0,0,0)");
+    gctx.fillStyle = bg;
+    gctx.fillRect(0, 0, gW, gH);
+  }
+
   function drawHeartIcon(x, y, r, alpha = 1) {
     gctx.save();
     gctx.translate(x, y);
@@ -1294,7 +1289,6 @@
     gctx.closePath();
     gctx.fill();
 
-    // crack
     gctx.shadowBlur = 0;
     gctx.strokeStyle = "rgba(255,255,255,0.55)";
     gctx.lineWidth = 2.2;
@@ -1356,6 +1350,26 @@
     gctx.strokeRect(x, bottomY, w, gH - bottomY);
   }
 
+  function drawBasket() {
+    const b = catchGame.basket;
+    const x = b.x, y = b.y;
+    gctx.save();
+    gctx.translate(x, y);
+    gctx.globalAlpha = 0.95;
+
+    const grad = gctx.createLinearGradient(-b.w/2, 0, b.w/2, 0);
+    grad.addColorStop(0, "rgba(255,77,166,0.22)");
+    grad.addColorStop(1, "rgba(45,252,255,0.16)");
+    gctx.fillStyle = grad;
+
+    gctx.fillRect(-b.w/2, -b.h/2, b.w, b.h);
+    gctx.strokeStyle = "rgba(255,255,255,0.28)";
+    gctx.lineWidth = 2*gDPR;
+    gctx.strokeRect(-b.w/2, -b.h/2, b.w, b.h);
+
+    gctx.restore();
+  }
+
   // ===================== MEMORY (DOM GAME) =====================
   const MEMORY_EMOJIS = ["💘","💖","💗","💞","❤️‍🔥","🌙","🌎","💍","✨","🍬","🎀","🌹"];
   let memoryState = null;
@@ -1370,7 +1384,7 @@
 
   function makeMemoryRound() {
     const cols = (innerWidth < 420) ? 3 : 4;
-    const total = cols === 3 ? 12 : 16; // 6 pairs or 8 pairs
+    const total = cols === 3 ? 12 : 16;
     const pairs = total / 2;
     const pool = shuffle(MEMORY_EMOJIS.slice()).slice(0, pairs);
     const deck = shuffle([...pool, ...pool].map((v, i) => ({ id: i, v })));
@@ -1399,17 +1413,12 @@
       btn.dataset.id = String(card.id);
 
       const span = document.createElement("span");
-      span.textContent = " ";
       btn.appendChild(span);
 
       if (memoryState.matched.has(card.id)) btn.classList.add("matched");
       if (memoryState.revealed.has(card.id)) btn.classList.add("revealed");
 
-      if (memoryState.revealed.has(card.id) || memoryState.matched.has(card.id)) {
-        span.textContent = card.v;
-      } else {
-        span.textContent = "💟";
-      }
+      span.textContent = (memoryState.revealed.has(card.id) || memoryState.matched.has(card.id)) ? card.v : "💟";
 
       btn.addEventListener("click", () => onMemoryPick(card.id));
       memoryGrid.appendChild(btn);
@@ -1418,7 +1427,6 @@
     scoreEl.textContent = String(memoryState.pairsFound);
     candyEl.textContent = String(memoryState.moves);
 
-    // High = best (lowest) moves
     const best = safeGet(HIGH_KEYS[GAME.MEMORY], null);
     highScoreEl.textContent = (best == null) ? "—" : String(best);
   }
@@ -1437,7 +1445,6 @@
       return;
     }
 
-    // second pick
     memoryState.moves += 1;
 
     const firstId = memoryState.first;
@@ -1452,7 +1459,6 @@
 
       renderMemory();
 
-      // completed?
       if (memoryState.pairsFound * 2 === memoryState.deck.length) {
         const best = safeGet(HIGH_KEYS[GAME.MEMORY], null);
         if (best == null || memoryState.moves < best) safeSet(HIGH_KEYS[GAME.MEMORY], memoryState.moves);
@@ -1465,7 +1471,6 @@
       return;
     }
 
-    // mismatch: hide after delay
     memoryState.lock = true;
     renderMemory();
     setTimeout(() => {
@@ -1493,13 +1498,11 @@
   }
 
   function resizeAllCanvases() {
-    // draw
     drawDPR = resizeCanvasToElement(drawCanvas);
     drawW = drawCanvas.width;
     drawH = drawCanvas.height;
     clearDraw();
 
-    // game
     gDPR = resizeCanvasToElement(gameCanvas);
     gW = gameCanvas.width;
     gH = gameCanvas.height;
@@ -1521,11 +1524,6 @@
     return { x, y };
   }
 
-  // flappy: tap to flap
-  // catch: drag basket
-  // pop: tap hearts
-  // pong: drag paddle
-
   let dragging = false;
 
   gameCanvas.addEventListener("pointerdown", (e) => {
@@ -1535,32 +1533,23 @@
     gameCanvas.setPointerCapture(e.pointerId);
 
     const p = getCanvasPointer(e);
-
-    if (activeGame === GAME.CATCH) {
-      catchGame.basket.x = p.x;
-    } else if (activeGame === GAME.PONG) {
-      pongGame.paddle.x = p.x;
-    }
+    if (activeGame === GAME.CATCH) catchGame.basket.x = p.x;
+    else if (activeGame === GAME.PONG) pongGame.paddle.x = p.x;
   });
 
   gameCanvas.addEventListener("pointermove", (e) => {
     if (!dragging) return;
+    const p = getCanvasPointer(e);
     if (activeGame === GAME.CATCH) {
-      const p = getCanvasPointer(e);
       catchGame.basket.x = clamp(p.x, catchGame.basket.w / 2, gW - catchGame.basket.w / 2);
     } else if (activeGame === GAME.PONG) {
-      const p = getCanvasPointer(e);
       pongGame.paddle.x = clamp(p.x, pongGame.paddle.w / 2, gW - pongGame.paddle.w / 2);
     }
   });
 
   gameCanvas.addEventListener("pointerup", (e) => {
     dragging = false;
-
     if (state.screen !== "game") return;
-    if (activeGame === GAME.MEMORY) return;
-
-    const p = getCanvasPointer(e);
 
     if (activeGame === GAME.FLAPPY) {
       e.preventDefault();
@@ -1568,11 +1557,12 @@
       return;
     }
 
+    const p = getCanvasPointer(e);
+
     if (activeGame === GAME.POP) {
       if (!popGame.running) startActiveGame();
       if (popGame.paused) return;
 
-      // pop check
       for (let i = popGame.hearts.length - 1; i >= 0; i--) {
         const h = popGame.hearts[i];
         if (popHit(p.x, p.y, h)) {
@@ -1586,7 +1576,6 @@
       return;
     }
 
-    // catch/pong: tap also starts
     if ((activeGame === GAME.CATCH && !catchGame.running) || (activeGame === GAME.PONG && !pongGame.running)) {
       startActiveGame();
     }
@@ -1605,14 +1594,13 @@
     gameMsg.textContent = LOVE_LINES[(msgIndex + 3) % LOVE_LINES.length];
   });
 
-  // Overlay tap
   overlay.addEventListener("pointerup", () => {
     if (state.screen !== "game") showScreen("game");
     resetActiveGame();
     startActiveGame();
   }, { passive: true });
 
-  // ===================== GAME LOOP =====================
+  // ===================== GAME LOOP (delta time) =====================
   let loopRunning = false;
   let lastGameT = performance.now();
 
@@ -1624,42 +1612,45 @@
   }
   function stopLoop() { loopRunning = false; }
 
-  function drawGameBackground() {
-    gctx.clearRect(0, 0, gW, gH);
-    const bg = gctx.createRadialGradient(gW * 0.4, gH * 0.3, 20, gW * 0.5, gH * 0.4, Math.max(gW, gH));
-    bg.addColorStop(0, "rgba(255,77,166,0.10)");
-    bg.addColorStop(0.5, "rgba(124,77,255,0.06)");
-    bg.addColorStop(1, "rgba(0,0,0,0)");
-    gctx.fillStyle = bg;
-    gctx.fillRect(0, 0, gW, gH);
+  function dtFactor(now) {
+    // factor relative to 60fps frames; clamped to avoid huge jumps
+    const ms = clamp(now - lastGameT, 0, 40);
+    lastGameT = now;
+    return ms / 16.6667;
   }
 
   function gameLoop(now) {
     if (!loopRunning) return;
-
-    const dt = Math.min(0.05, (now - lastGameT) / 1000); // seconds, capped
-    lastGameT = now;
+    const f = dtFactor(now);
 
     drawGameBackground();
 
+    // ----------------- FLAPPY -----------------
     if (activeGame === GAME.FLAPPY) {
       if (!flappy.running) { stopLoop(); return; }
       if (flappy.paused) { requestAnimationFrame(gameLoop); return; }
 
-      flappy.t++;
+      // pipe spawn by timer (ms) => consistent across refresh rates
+      flappy.pipeTimer += (now - (now - f*16.6667)); // effectively ms step
+      // (more simply, add actual ms each loop)
+      // We can safely add (f*16.6667) here:
+      flappy.pipeTimer += f * 16.6667;
 
-      // physics
-      flappy.bird.vy += flappy.gravity * gDPR;
-      flappy.bird.y += flappy.bird.vy;
+      while (flappy.pipeTimer >= flappy.pipeEvery) {
+        flappy.pipeTimer -= flappy.pipeEvery;
+        spawnPipe();
+      }
 
-      // spawn pipes
-      const interval = state.eco ? 110 : 95;
-      if (flappy.t % interval === 0) spawnPipe();
+      // physics (scaled by f)
+      flappy.bird.vy += flappy._g * f;
+      flappy.bird.vy = clamp(flappy.bird.vy, -999, flappy._term);
+      flappy.bird.y += flappy.bird.vy * f;
 
-      // move pipes + score
+      // move pipes/candy (scaled by f)
+      const pxStep = flappy.pipeSpeed * f;
       for (let i = flappy.pipes.length - 1; i >= 0; i--) {
         const p = flappy.pipes[i];
-        p.x -= flappy.pipeSpeed;
+        p.x -= pxStep;
 
         if (!p.passed && p.x + flappy.pipeW < flappy.bird.x) {
           p.passed = true;
@@ -1669,26 +1660,23 @@
         }
 
         if (birdCollidesPipe(p.x, p.topH)) { endActiveGame(4); return; }
-        if (p.x + flappy.pipeW < -120 * gDPR) flappy.pipes.splice(i, 1);
+        if (p.x + flappy.pipeW < -140 * gDPR) flappy.pipes.splice(i, 1);
       }
 
-      // candies
       for (let i = flappy.candies.length - 1; i >= 0; i--) {
         const c = flappy.candies[i];
-        c.x -= flappy.candySpeed;
+        c.x -= (flappy.candySpeed * f);
         if (birdCollidesCandy(c)) {
           c.taken = true;
           flappy.candy += 1;
           candyEl.textContent = String(flappy.candy);
           addSparks((c.x / gDPR), (c.y / gDPR), state.eco ? 18 : 26);
         }
-        if (c.x < -120 * gDPR || c.taken) flappy.candies.splice(i, 1);
+        if (c.x < -140 * gDPR || c.taken) flappy.candies.splice(i, 1);
       }
 
-      // bounds
       if (flappy.bird.y - flappy.bird.r < 0 || flappy.bird.y + flappy.bird.r > gH) { endActiveGame(4); return; }
 
-      // draw
       for (const p of flappy.pipes) drawPipes(p);
       for (const c of flappy.candies) drawCandy(c);
       drawHeartIcon(flappy.bird.x, flappy.bird.y, flappy.bird.r, 1);
@@ -1699,341 +1687,288 @@
       return;
     }
 
+    // ----------------- CATCH -----------------
     if (activeGame === GAME.CATCH) {
       if (!catchGame.running) { stopLoop(); return; }
       if (catchGame.paused) { requestAnimationFrame(gameLoop); return; }
 
-      catchGame.t++;
+      catchGame.spawnTimer += f * 16.6667;
+      const spawnEvery = state.eco ? 420 : 360;
+      while (catchGame.spawnTimer >= spawnEvery) {
+        catchGame.spawnTimer -= spawnEvery;
+        spawnFalling();
+      }
 
-      // spawn
-      const spawnEvery = state.eco ? 26 : 22;
-      if (catchGame.t % spawnEvery === 0) spawnFalling();
-
-      // update fall
-      const bx = clamp(catchGame.basket.x, catchGame.basket.w / 2, gW - catchGame.basket.w / 2);
-      catchGame.basket.x = bx;
+      catchGame.basket.x = clamp(catchGame.basket.x, catchGame.basket.w / 2, gW - catchGame.basket.w / 2);
 
       for (let i = catchGame.fall.length - 1; i >= 0; i--) {
-        const f = catchGame.fall[i];
-        f.y += f.vy;
+        const obj = catchGame.fall[i];
+        obj.y += obj.vy * f;
 
-        // caught?
-        if (catchHit(f, catchGame.basket.x, catchGame.basket.y, catchGame.basket.w, catchGame.basket.h)) {
-          if (f.type === "heart") {
+        if (catchHit(obj, catchGame.basket.x, catchGame.basket.y, catchGame.basket.w, catchGame.basket.h)) {
+          if (obj.type === "heart") {
             catchGame.score += 1;
             scoreEl.textContent = String(catchGame.score);
-            addSparks((f.x / gDPR), (f.y / gDPR), state.eco ? 14 : 20);
+            addSparks(obj.x / gDPR, obj.y / gDPR, state.eco ? 14 : 20);
           } else {
             catchGame.misses += 1;
             candyEl.textContent = String(catchGame.misses);
-            addSparks((f.x / gDPR), (f.y / gDPR), state.eco ? 10 : 14);
           }
           catchGame.fall.splice(i, 1);
           continue;
         }
 
-        // missed bottom
-        if (f.y - f.r > gH + 40 * gDPR) {
-          if (f.type === "heart") {
+        if (obj.y > gH + 50 * gDPR) {
+          if (obj.type === "heart") {
             catchGame.misses += 1;
             candyEl.textContent = String(catchGame.misses);
+            if (catchGame.misses >= 10) { endActiveGame(4); return; }
           }
           catchGame.fall.splice(i, 1);
         }
       }
 
-      // end condition
-      if (catchGame.misses >= 7) { endActiveGame(4); return; }
-
-      // draw falling
-      for (const f of catchGame.fall) {
-        if (f.type === "heart") drawHeartIcon(f.x, f.y, f.r, 0.95);
-        else drawBrokenHeart(f.x, f.y, f.r);
+      // draw falling objects + basket
+      for (const obj of catchGame.fall) {
+        if (obj.type === "heart") drawHeartIcon(obj.x, obj.y, obj.r, 0.95);
+        else drawBrokenHeart(obj.x, obj.y, obj.r);
       }
-
-      // basket
-      gctx.save();
-      gctx.translate(catchGame.basket.x, catchGame.basket.y);
-      const w = catchGame.basket.w, h = catchGame.basket.h;
-      const grad = gctx.createLinearGradient(-w / 2, 0, w / 2, 0);
-      grad.addColorStop(0, "rgba(45,252,255,0.18)");
-      grad.addColorStop(1, "rgba(255,77,166,0.18)");
-      gctx.fillStyle = grad;
-      gctx.strokeStyle = "rgba(255,255,255,0.25)";
-      gctx.lineWidth = 2 * gDPR;
-      roundRect(gctx, -w / 2, -h / 2, w, h, 10 * gDPR);
-      gctx.fill();
-      gctx.stroke();
-      gctx.restore();
-
-      // hint
-      if (catchGame.score && catchGame.score % 10 === 0) gameMsg.textContent = LOVE_LINES[((catchGame.score / 10) | 0) % LOVE_LINES.length];
+      drawBasket();
 
       requestAnimationFrame(gameLoop);
       return;
     }
 
+    // ----------------- POP -----------------
     if (activeGame === GAME.POP) {
       if (!popGame.running) { stopLoop(); return; }
       if (popGame.paused) { requestAnimationFrame(gameLoop); return; }
 
-      // time
-      popGame.timeLeft -= dt;
-      if (popGame.timeLeft < 0) popGame.timeLeft = 0;
+      popGame.timeLeft = Math.max(0, popGame.timeLeft - (f * 16.6667) / 1000);
       candyEl.textContent = popGame.timeLeft.toFixed(1);
 
-      // spawn hearts
-      const want = state.eco ? 7 : 10;
-      if (popGame.hearts.length < want && Math.random() < 0.16) spawnPopHeart();
+      popGame.spawnTimer += f * 16.6667;
+      const spawnEvery = state.eco ? 460 : 380;
+      while (popGame.spawnTimer >= spawnEvery) {
+        popGame.spawnTimer -= spawnEvery;
+        spawnPopHeart();
+      }
 
-      // update hearts
       for (let i = popGame.hearts.length - 1; i >= 0; i--) {
         const h = popGame.hearts[i];
-        h.life -= dt;
-        h.x += h.vx;
-        h.y += h.vy;
+        h.life -= (f * 16.6667) / 1000;
+        h.x += h.vx * f;
+        h.y += h.vy * f;
 
-        // bounce edges
-        if (h.x < h.r) { h.x = h.r; h.vx *= -1; }
-        if (h.x > gW - h.r) { h.x = gW - h.r; h.vx *= -1; }
-        if (h.y < h.r) { h.y = h.r; h.vy *= -1; }
-        if (h.y > gH - h.r) { h.y = gH - h.r; h.vy *= -1; }
+        if (h.x < h.r || h.x > gW - h.r) h.vx *= -1;
+        if (h.y < h.r || h.y > gH - h.r) h.vy *= -1;
 
         if (h.life <= 0) popGame.hearts.splice(i, 1);
       }
 
-      // draw hearts
-      for (const h of popGame.hearts) drawHeartIcon(h.x, h.y, h.r, 0.92);
+      for (const h of popGame.hearts) drawHeartIcon(h.x, h.y, h.r, 0.85);
 
-      // end
-      if (popGame.timeLeft <= 0) { endActiveGame(0); loveBurst(state.eco ? 60 : 110, 50); return; }
+      if (popGame.timeLeft <= 0) { endActiveGame(4); return; }
 
       requestAnimationFrame(gameLoop);
       return;
     }
 
+    // ----------------- PONG -----------------
     if (activeGame === GAME.PONG) {
       if (!pongGame.running) { stopLoop(); return; }
       if (pongGame.paused) { requestAnimationFrame(gameLoop); return; }
 
-      // clamp paddle
       pongGame.paddle.x = clamp(pongGame.paddle.x, pongGame.paddle.w / 2, gW - pongGame.paddle.w / 2);
 
-      // move ball
-      const b = pongGame.ball;
-      b.x += b.vx;
-      b.y += b.vy;
+      // ball move
+      pongGame.ball.x += pongGame.ball.vx * f;
+      pongGame.ball.y += pongGame.ball.vy * f;
 
       // walls
-      if (b.x < b.r) { b.x = b.r; b.vx *= -1; }
-      if (b.x > gW - b.r) { b.x = gW - b.r; b.vx *= -1; }
-      if (b.y < b.r) { b.y = b.r; b.vy *= -1; }
+      if (pongGame.ball.x < pongGame.ball.r) { pongGame.ball.x = pongGame.ball.r; pongGame.ball.vx *= -1; }
+      if (pongGame.ball.x > gW - pongGame.ball.r) { pongGame.ball.x = gW - pongGame.ball.r; pongGame.ball.vx *= -1; }
+      if (pongGame.ball.y < pongGame.ball.r) { pongGame.ball.y = pongGame.ball.r; pongGame.ball.vy *= -1; }
 
       // paddle collision
-      const px = pongGame.paddle.x, py = pongGame.paddle.y;
-      const pw = pongGame.paddle.w, ph = pongGame.paddle.h;
+      const p = pongGame.paddle;
+      const b = pongGame.ball;
+      const top = p.y - p.h/2;
 
-      const withinX = (b.x > px - pw / 2 - b.r) && (b.x < px + pw / 2 + b.r);
-      const withinY = (b.y + b.r > py - ph / 2) && (b.y + b.r < py + ph / 2 + b.r);
+      if (b.y + b.r >= top && b.y + b.r <= p.y + p.h/2 + b.r) {
+        if (b.x >= p.x - p.w/2 - b.r && b.x <= p.x + p.w/2 + b.r && b.vy > 0) {
+          b.y = top - b.r;
+          b.vy *= -1;
 
-      if (withinX && withinY && b.vy > 0) {
-        b.y = py - ph / 2 - b.r;
-        b.vy *= -1;
+          // angle based on hit position
+          const dx = (b.x - p.x) / (p.w/2);
+          b.vx += dx * (state.eco ? 0.6 : 0.75) * gDPR;
 
-        // angle based on hit position
-        const off = (b.x - px) / (pw / 2);
-        b.vx += off * (state.eco ? 0.55 : 0.7) * gDPR;
+          pongGame.rally += 1;
+          scoreEl.textContent = String(pongGame.rally);
 
-        pongGame.rally += 1;
-        scoreEl.textContent = String(pongGame.rally);
-
-        if (pongGame.rally % 8 === 0) gameMsg.textContent = LOVE_LINES[((pongGame.rally / 8) | 0) % LOVE_LINES.length];
-
-        // tiny sparkle
-        addSparks((b.x / gDPR), (b.y / gDPR), state.eco ? 10 : 16);
+          addSparks(b.x / gDPR, b.y / gDPR, state.eco ? 10 : 16);
+        }
       }
 
-      // bottom = lose life
-      if (b.y - b.r > gH + 30 * gDPR) {
+      // missed
+      if (b.y > gH + 40 * gDPR) {
         pongGame.lives -= 1;
         candyEl.textContent = String(pongGame.lives);
-        if (pongGame.lives <= 0) { endActiveGame(1); return; }
+        if (pongGame.lives <= 0) { endActiveGame(4); return; }
         pongResetBall();
       }
 
-      // draw ball + paddle
-      drawHeartIcon(b.x, b.y, b.r, 1);
-
+      // draw paddle
       gctx.save();
-      gctx.translate(px, py);
-      const grad = gctx.createLinearGradient(-pw / 2, 0, pw / 2, 0);
-      grad.addColorStop(0, "rgba(255,211,110,0.18)");
-      grad.addColorStop(1, "rgba(124,77,255,0.18)");
+      gctx.translate(p.x, p.y);
+      const grad = gctx.createLinearGradient(-p.w/2, 0, p.w/2, 0);
+      grad.addColorStop(0, "rgba(255,77,166,0.22)");
+      grad.addColorStop(1, "rgba(45,252,255,0.16)");
       gctx.fillStyle = grad;
-      gctx.strokeStyle = "rgba(255,255,255,0.25)";
-      gctx.lineWidth = 2 * gDPR;
-      roundRect(gctx, -pw / 2, -ph / 2, pw, ph, 10 * gDPR);
-      gctx.fill();
-      gctx.stroke();
+      gctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      gctx.strokeStyle = "rgba(255,255,255,0.28)";
+      gctx.lineWidth = 2*gDPR;
+      gctx.strokeRect(-p.w/2, -p.h/2, p.w, p.h);
       gctx.restore();
+
+      // draw ball
+      drawHeartIcon(b.x, b.y, b.r, 0.95);
 
       requestAnimationFrame(gameLoop);
       return;
     }
 
-    // memory has no loop
     stopLoop();
   }
 
-  function roundRect(ctx, x, y, w, h, r) {
-    const rr = Math.min(r, w / 2, h / 2);
-    ctx.beginPath();
-    ctx.moveTo(x + rr, y);
-    ctx.arcTo(x + w, y, x + w, y + h, rr);
-    ctx.arcTo(x + w, y + h, x, y + h, rr);
-    ctx.arcTo(x, y + h, x, y, rr);
-    ctx.arcTo(x, y, x + w, y, rr);
-    ctx.closePath();
+  // ===================== MEMORY STARTER =====================
+  function resetMemoryRoundOnly() {
+    memoryState = makeMemoryRound();
+    renderMemory();
   }
 
-  // ===================== BUTTON / OVERLAY WIRING =====================
-  function setOverlayCopyForGame() {
-    // handled inside setTabs()
+  // ===================== GAME TAB DEFAULTS =====================
+  function switchToGameDefault() {
+    activeGame = GAME.FLAPPY;
+    setTabs();
+    resetActiveGame();
   }
 
-  // ===================== SCREEN SWITCH SIDE EFFECTS =====================
+  // ===================== SWITCH SIDE EFFECTS =====================
   function onScreenChanged() {
     setActiveNav();
-
-    // pause active canvas games if leaving game screen
     if (state.screen !== "game") {
+      // pause any running canvas game
       if (flappy.running) flappy.paused = true;
       if (catchGame.running) catchGame.paused = true;
       if (popGame.running) popGame.paused = true;
       if (pongGame.running) pongGame.paused = true;
       pauseBtn.textContent = "▶ Resume";
     }
+    setTimeout(resizeAllCanvases, 40);
   }
 
-  // ===================== BOOT UP =====================
-  function heartInit() {
-    refreshHearts();
-    seedHearts();
-  }
+  const _showScreen = showScreen;
+  showScreen = function(name) {
+    _showScreen(name);
+    onScreenChanged();
+  };
 
-  // initial messages for footers
-  drawMsg.textContent = LOVE_LINES[1];
-  gameMsg.textContent = LOVE_LINES[2];
-
-  // Start experience if user clicks nav early
-  [toLove, toDraw, toGame].forEach(btn => btn.addEventListener("click", startExperience, { once: true }));
-
-  // ======= Default: Love screen =======
-  showScreen("love");
-
-  // ======= Canvas sizes + FX =======
-  resizeFX();
-  requestAnimationFrame(fxFrame);
-  heartInit();
-  resizeAllCanvases();
-
-  // ======= Default game selection =======
-  activeGame = GAME.FLAPPY;
-  setTabs();
-  resetActiveGame();
-
-  // ======= Game Buttons =======
+  // ===================== GAME BUTTONS =====================
   pauseBtn.addEventListener("click", () => {
     togglePause();
-    if (!activeGameIsPaused()) ensureLoop();
+    if (!loopRunning && (activeGame !== GAME.MEMORY)) ensureLoop();
   });
 
-  // ======= Overlay already wired above =======
-
-  // ======= helpers =======
-  function activeGameIsPaused() {
-    if (activeGame === GAME.FLAPPY) return flappy.paused;
-    if (activeGame === GAME.CATCH) return catchGame.paused;
-    if (activeGame === GAME.POP) return popGame.paused;
-    if (activeGame === GAME.PONG) return pongGame.paused;
-    return false;
-  }
-
-  // ===================== EXTRA: GAME UI BUTTONS (global) =====================
   restartBtn.addEventListener("click", () => {
     resetActiveGame();
     startActiveGame();
   });
 
-  startGameBtn.addEventListener("click", () => {
-    showScreen("game");
-    startActiveGame();
-  });
-
-  // ===================== LOVE SCREEN HOTKEYS + SPARK START =====================
-  window.addEventListener("keydown", (e) => {
-    if (state.screen === "game" && activeGame === GAME.FLAPPY) {
-      if (e.key === " " || e.key === "ArrowUp") flappyFlap();
-    }
-  });
-
-  // ===================== SIMPLE GAME-SPECIFIC STARTERS =====================
-  function startActiveGameIfNeeded() {
-    if (activeGame === GAME.MEMORY) {
-      overlay.classList.add("hidden");
-      return;
-    }
-    const running =
-      (activeGame === GAME.FLAPPY && flappy.running) ||
-      (activeGame === GAME.CATCH && catchGame.running) ||
-      (activeGame === GAME.POP && popGame.running) ||
-      (activeGame === GAME.PONG && pongGame.running);
-    if (!running) startActiveGame();
-  }
-
-  // ===================== “TRY AGAIN” OVERLAY ALSO WORKS FOR MEMORY =====================
+  // ===================== CONTROLLED OVERLAY TAP =====================
   overlay.addEventListener("pointerup", () => {
     resetActiveGame();
-    startActiveGameIfNeeded();
+    startActiveGame();
   }, { passive: true });
 
-  // ===================== NAV CLICK SIDE EFFECTS =====================
-  toLove.addEventListener("click", onScreenChanged);
-  toDraw.addEventListener("click", onScreenChanged);
-  toGame.addEventListener("click", onScreenChanged);
+  // ===================== HEARTS STREAM BOOT =====================
+  refreshHearts();
+  seedHearts();
 
-  // ===================== MEMORY: START BUTTON SHOULD JUST HIDE OVERLAY =====================
-  // (handled by startActiveGame)
-  // ===================== POP: ensure hearts exist on start =====================
-  function prepPopOnStart() {
-    while (popGame.hearts.length < (state.eco ? 5 : 7)) spawnPopHeart();
+  // ===================== FX BOOT =====================
+  resizeFX();
+  requestAnimationFrame(fxFrame);
+
+  // ===================== CANVASES BOOT =====================
+  function resizeCanvasToElement(canvas) {
+    const r = canvas.getBoundingClientRect();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.max(1, Math.floor(r.width * dpr));
+    canvas.height = Math.max(1, Math.floor(r.height * dpr));
+    return dpr;
   }
 
-  // ===================== START ACTIVE GAME HOOKS =====================
-  const _startActiveGame = startActiveGame;
-  startActiveGame = function () {
-    if (activeGame === GAME.POP) prepPopOnStart();
-    if (activeGame === GAME.PONG) {
-      // if ball is "stopped" (fresh reset), give it a push
-      if (pongGame.ball.vx === 0 && pongGame.ball.vy === 0) resetPong();
-    }
-    _startActiveGame();
-  };
+  function resizeAllCanvases() {
+    drawDPR = resizeCanvasToElement(drawCanvas);
+    drawW = drawCanvas.width;
+    drawH = drawCanvas.height;
+    clearDraw();
 
-  // ===================== GAME END HIGHS + UI UPDATE TICK =====================
-  const _endActiveGame = endActiveGame;
-  endActiveGame = function (idx) {
-    _endActiveGame(idx);
+    gDPR = resizeCanvasToElement(gameCanvas);
+    gW = gameCanvas.width;
+    gH = gameCanvas.height;
+
+    syncDifficulty();
+
+    // reset by game
+    if (activeGame === GAME.FLAPPY) resetFlappy();
+    if (activeGame === GAME.CATCH) resetCatch();
+    if (activeGame === GAME.POP) resetPop();
+    if (activeGame === GAME.PONG) resetPong();
+    if (activeGame === GAME.MEMORY) resetMemoryRoundOnly();
+
     loadHigh();
-  };
+  }
 
-  // ===================== (Tiny) FIX: keep score labels correct after load =====================
-  setTabs();
+  // ===================== CONTROL PANEL DEFAULT MSGS =====================
+  drawMsg.textContent = LOVE_LINES[1];
+  gameMsg.textContent = LOVE_LINES[2];
 
-  // ===================== MISSING: POP / PONG END CHECKS INTO endActiveGame =====================
-  // Already in loop.
+  // ===================== GAME START / RESTART =====================
+  startGameBtn.addEventListener("click", () => { showScreen("game"); startActiveGame(); });
 
-  // ===================== BONUS: CLICK ON SCREEN LOVE ALSO STARTS =====================
-  screenLove.addEventListener("pointerup", startExperience, { passive: true });
+  // Memory button
+  memoryNew.addEventListener("click", () => {
+    if (activeGame !== GAME.MEMORY) switchGame(GAME.MEMORY);
+    resetMemoryRoundOnly();
+    overlay.classList.add("hidden");
+  });
 
+  // ===================== INITIALIZE =====================
+  resizeAllCanvases();
+  switchToGameDefault();
+  showScreen("love");
+
+  // Start experience if user taps nav early
+  [toLove, toDraw, toGame].forEach(btn => btn.addEventListener("click", startExperience, { once: true }));
+
+  // ===================== MISSING PIECE: SPARKLES HELPERS =====================
+  // (kept last so it can use fx DPR sizes)
+  function addSparks(x, y, count = 50) {
+    for (let k = 0; k < count; k++) {
+      const ang = Math.random() * Math.PI * 2;
+      const spd = rand(1.2, state.eco ? 5.6 : 7.2) * DPR;
+      sparks.push({
+        x: x * DPR, y: y * DPR,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd,
+        life: rand(18, state.eco ? 40 : 54),
+        r: rand(1.0, 2.2) * DPR,
+        hue: rand(300, 360)
+      });
+    }
+    const cap = state.eco ? 220 : 480;
+    if (sparks.length > cap) sparks.splice(0, sparks.length - cap);
+  }
 })();
