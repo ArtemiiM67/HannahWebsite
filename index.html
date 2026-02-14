@@ -2,75 +2,70 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#07050f" />
   <title>I Love You Hannah Banana 💘</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Ambient layers -->
-  <div class="bg">
-    <canvas id="stars"></canvas>
-    <canvas id="sparks"></canvas>
-    <div class="aurora a1"></div>
-    <div class="aurora a2"></div>
-    <div class="aurora a3"></div>
+  <div class="bg" aria-hidden="true">
+    <canvas id="fx"></canvas>
+
+    <div class="grain"></div>
     <div class="vignette"></div>
+
+    <div class="streak s1"></div>
+    <div class="streak s2"></div>
+    <div class="streak s3"></div>
   </div>
 
-  <!-- Floating hearts (CSS-only + JS adds more) -->
-  <div class="heart-field" aria-hidden="true"></div>
+  <div class="heart-field" aria-hidden="true" id="heartField"></div>
 
-  <!-- Main card -->
   <main class="stage" id="stage">
     <section class="card" id="card">
-      <div class="ribbon r1"></div>
-      <div class="ribbon r2"></div>
+      <div class="edge-glow" aria-hidden="true"></div>
 
-      <div class="badge">
-        <span class="dot"></span>
-        <span class="text">Valentine Mode: ON</span>
+      <div class="topline">
+        <div class="badge">
+          <span class="dot"></span>
+          <span class="text">Valentine Protocol: ACTIVE</span>
+        </div>
+
+        <div class="mini-meter" title="Love Level" aria-hidden="true">
+          <span class="bar b1"></span><span class="bar b2"></span><span class="bar b3"></span><span class="bar b4"></span>
+        </div>
       </div>
 
       <h1 class="title">
-        <span class="title-glow"></span>
+        <span class="title-glow" aria-hidden="true"></span>
         <span class="type" id="type"></span><span class="cursor">|</span>
       </h1>
 
       <p class="subtitle" id="subtitle">
-        You’re my favorite person in the universe. Forever & always. 💞
+        Infinite hearts, infinite vibes, infinite us. ♾️💖
       </p>
 
       <div class="controls">
         <button class="btn primary" id="burstBtn">💥 Love Burst</button>
-        <button class="btn" id="toggleSlow">🌀 Slow-Mo</button>
+        <button class="btn" id="toggleEco">📱 Mobile Eco</button>
         <button class="btn" id="toggleNeon">✨ Neon</button>
       </div>
 
       <div class="hint">
-        Click anywhere for sparkles • Move your mouse for parallax • Press <kbd>H</kbd> for extra hearts
+        Tap anywhere for sparkles :) 
       </div>
 
       <div class="signature">
         <span class="sigline"></span>
-        <span class="sigtext">— from me to <b>Hannah Banana</b> 🍌💘</span>
+        <span class="sigtext">— for <b>Hannah Banana</b> 🍌💘</span>
       </div>
+
+      <div class="corner c1" aria-hidden="true"></div>
+      <div class="corner c2" aria-hidden="true"></div>
     </section>
   </main>
-
-  <!-- SVG defs for filters -->
-  <svg width="0" height="0" class="defs" aria-hidden="true">
-    <filter id="goo">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"/>
-      <feColorMatrix in="blur" mode="matrix"
-        values="
-          1 0 0 0 0
-          0 1 0 0 0
-          0 0 1 0 0
-          0 0 0 22 -10"
-        result="goo"/>
-      <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
-    </filter>
-  </svg>
 
   <script src="script.js"></script>
 </body>
