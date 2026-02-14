@@ -922,7 +922,6 @@
   }
 
   // ===================== GAME STATES =====================
-  // ✅ IMPORTANT: Flappy now uses delta-time so 120Hz/144Hz doesn't make it fall instantly.
   const flappy = {
     running:false, paused:false,
     score:0, candy:0,
@@ -931,7 +930,7 @@
 
     // floatier + slower (base units are "per 60fps frame" but we apply dt scaling)
     gravity: 0.12,        // weaker gravity
-    flap: -5.4,           // gentler flap
+    flap: -2.0,           // gentler flap
     termV: 5.9,           // terminal velocity cap
 
     pipes: [],
