@@ -3,40 +3,58 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#07050f" />
-  <title>I Love You Hannah Banana, to the moon and back 💘</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <meta name="theme-color" content="#06040d" />
+  <title>I Love You Hannah Banana 💘</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="bg" aria-hidden="true">
     <canvas id="fx"></canvas>
-
     <div class="grain"></div>
     <div class="vignette"></div>
 
+    <!-- CSS streaks (cheap) -->
     <div class="streak s1"></div>
     <div class="streak s2"></div>
     <div class="streak s3"></div>
   </div>
 
-  <div class="heart-field" aria-hidden="true" id="heartField"></div>
+  <!-- DOM hearts (pooled + capped) -->
+  <div class="heart-field" id="heartField" aria-hidden="true"></div>
 
+  <!-- INTRO OVERLAY -->
+  <section class="intro" id="intro" aria-hidden="false">
+    <div class="portal">
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <div class="ring r3"></div>
+      <div class="core"></div>
+    </div>
+
+    <div class="intro-text">
+      <div class="chip"><span class="dot"></span>Booting Love Engine…</div>
+      <div class="bigline" id="introLine">Initializing ♡</div>
+      <div class="subline">Tap to begin the infinite.</div>
+    </div>
+  </section>
+
+  <!-- MAIN -->
   <main class="stage" id="stage">
     <section class="card" id="card">
       <div class="edge-glow" aria-hidden="true"></div>
+      <div class="sheen" aria-hidden="true"></div>
 
-      <div class="topline">
+      <header class="topbar">
         <div class="badge">
           <span class="dot"></span>
-          <span class="text">Valentine's Day Gift</span>
+          <span class="text">Valentine Protocol: ACTIVE</span>
         </div>
 
-        <div class="mini-meter" title="Love Level" aria-hidden="true">
-          <span class="bar b1"></span><span class="bar b2"></span><span class="bar b3"></span><span class="bar b4"></span>
+        <div class="tiny">
+          <div class="pill" id="fpsPill" title="Performance state">⚡ smooth</div>
+          <button class="iconbtn" id="openPanel" aria-label="Open controls">☰</button>
         </div>
-      </div>
+      </header>
 
       <h1 class="title">
         <span class="title-glow" aria-hidden="true"></span>
@@ -44,27 +62,106 @@
       </h1>
 
       <p class="subtitle" id="subtitle">
-        Me and You Forever ♾️💖
+        Infinite hearts, infinite vibes, infinite us. ♾️💖
       </p>
 
-      <div class="controls">
+      <div class="cta-row">
         <button class="btn primary" id="burstBtn">💥 Love Burst</button>
-        <button class="btn" id="toggleEco">📱 Mobile Eco</button>
-        <button class="btn" id="toggleNeon">✨ Neon</button>
+        <button class="btn" id="momentBtn">🎬 Next Moment</button>
       </div>
 
-      <div class="hint">
-        Tap anywhere for sparkles :) 
+      <div class="micro">
+        <div class="meter" aria-hidden="true">
+          <span class="bar b1"></span><span class="bar b2"></span><span class="bar b3"></span><span class="bar b4"></span>
+        </div>
+        <div class="hint">
+          Tap for sparkles • Drag for tilt • Press <kbd>H</kbd> for hearts • Press <kbd>M</kbd> for meteors
+        </div>
       </div>
 
       <div class="signature">
         <span class="sigline"></span>
-        <span class="sigtext">— for <b>my baby</b> 💘💘💘</span>
+        <span class="sigtext">— for <b>Hannah Banana</b> 🍌💘</span>
       </div>
 
       <div class="corner c1" aria-hidden="true"></div>
       <div class="corner c2" aria-hidden="true"></div>
     </section>
+
+    <!-- CONTROL PANEL (slide-up on mobile) -->
+    <aside class="panel" id="panel" aria-hidden="true">
+      <div class="panel-head">
+        <div class="panel-title">Love Controls</div>
+        <button class="iconbtn" id="closePanel" aria-label="Close controls">✕</button>
+      </div>
+
+      <div class="toggles">
+        <label class="toggle">
+          <input type="checkbox" id="tEco" />
+          <span class="ui"></span>
+          <span class="lbl">Mobile Eco</span>
+          <span class="desc">Fewer particles, smoother phones.</span>
+        </label>
+
+        <label class="toggle">
+          <input type="checkbox" id="tNeon" />
+          <span class="ui"></span>
+          <span class="lbl">Neon Glow</span>
+          <span class="desc">Extra shine.</span>
+        </label>
+
+        <label class="toggle">
+          <input type="checkbox" id="tHearts" checked />
+          <span class="ui"></span>
+          <span class="lbl">Hearts</span>
+          <span class="desc">Floating hearts stream.</span>
+        </label>
+
+        <label class="toggle">
+          <input type="checkbox" id="tMeteors" checked />
+          <span class="ui"></span>
+          <span class="lbl">Meteors</span>
+          <span class="desc">Occasional shooting stars.</span>
+        </label>
+
+        <label class="toggle">
+          <input type="checkbox" id="tConstellations" checked />
+          <span class="ui"></span>
+          <span class="lbl">Constellations</span>
+          <span class="desc">Lines connect near stars.</span>
+        </label>
+
+        <label class="toggle">
+          <input type="checkbox" id="tMusic" />
+          <span class="ui"></span>
+          <span class="lbl">Soft Music</span>
+          <span class="desc">Tiny synth pad (no file).</span>
+        </label>
+
+        <label class="toggle">
+          <input type="checkbox" id="tMotionLock" />
+          <span class="ui"></span>
+          <span class="lbl">Lock Motion</span>
+          <span class="desc">Stops tilt if you want calm.</span>
+        </label>
+      </div>
+
+      <div class="sliders">
+        <div class="sliderrow">
+          <div class="slabel">Intensity</div>
+          <input type="range" id="sIntensity" min="0.6" max="1.6" step="0.05" value="1.0" />
+        </div>
+        <div class="sliderrow">
+          <div class="slabel">Heart Rate</div>
+          <input type="range" id="sHearts" min="0" max="100" step="1" value="65" />
+        </div>
+      </div>
+
+      <div class="panel-actions">
+        <button class="btn" id="resetBtn">↺ Reset</button>
+        <button class="btn primary" id="megaBtn">🌋 MEGA MODE</button>
+      </div>
+    </aside>
   </main>
 
   <script src="script.js"></script>
