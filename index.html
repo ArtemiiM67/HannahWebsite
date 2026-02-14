@@ -8,21 +8,20 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- Ambient background (one optimized canvas) -->
   <div class="bg" aria-hidden="true">
     <canvas id="fx"></canvas>
     <div class="grain"></div>
     <div class="vignette"></div>
-
-    <!-- CSS streaks (cheap) -->
     <div class="streak s1"></div>
     <div class="streak s2"></div>
     <div class="streak s3"></div>
   </div>
 
-  <!-- DOM hearts (pooled + capped) -->
+  <!-- Hearts stream (pooled + capped) -->
   <div class="heart-field" id="heartField" aria-hidden="true"></div>
 
-  <!-- INTRO OVERLAY -->
+  <!-- INTRO -->
   <section class="intro" id="intro" aria-hidden="false">
     <div class="portal">
       <div class="ring r1"></div>
@@ -33,62 +32,160 @@
 
     <div class="intro-text">
       <div class="chip"><span class="dot"></span>Booting Love Engine…</div>
-      <div class="bigline" id="introLine">Initializing ♡</div>
-      <div class="subline">Tap to begin the infinite.</div>
+      <div class="bigline" id="introLine">Tap to begin 💘</div>
+      <div class="subline">A 3-screen Valentine universe (Love • Draw • Flappy).</div>
     </div>
   </section>
 
-  <!-- MAIN -->
-  <main class="stage" id="stage">
-    <section class="card" id="card">
-      <div class="edge-glow" aria-hidden="true"></div>
-      <div class="sheen" aria-hidden="true"></div>
+  <!-- TOP NAV (always top-right) -->
+  <header class="nav" id="nav" aria-label="Navigation">
+    <div class="nav-left">
+      <span class="nav-pill" id="perfPill">⚡ smooth</span>
+    </div>
 
-      <header class="topbar">
+    <div class="nav-right">
+      <button class="navbtn" id="toLove" aria-label="Love screen" title="Love">💌</button>
+      <button class="navbtn" id="toDraw" aria-label="Draw screen" title="Draw">🎨</button>
+      <button class="navbtn" id="toGame" aria-label="Game screen" title="Flappy">🕊️</button>
+      <button class="navbtn menu" id="openPanel" aria-label="Open controls" title="Controls">☰</button>
+    </div>
+  </header>
+
+  <main class="stage" id="stage">
+    <!-- SCREEN 1: LOVE -->
+    <section class="screen active" id="screenLove" aria-hidden="false">
+      <section class="card" id="cardLove">
+        <div class="edge-glow" aria-hidden="true"></div>
+        <div class="sheen" aria-hidden="true"></div>
+
         <div class="badge">
           <span class="dot"></span>
           <span class="text">Valentine Protocol: ACTIVE</span>
         </div>
 
-        <div class="tiny">
-          <div class="pill" id="fpsPill" title="Performance state">⚡ smooth</div>
-          <button class="iconbtn" id="openPanel" aria-label="Open controls">☰</button>
+        <h1 class="title">
+          <span class="title-glow" aria-hidden="true"></span>
+          <span class="type" id="type"></span><span class="cursor">|</span>
+        </h1>
+
+        <p class="subtitle" id="subtitle"></p>
+
+        <div class="cta-row">
+          <button class="btn primary" id="burstBtn">💥 Love Burst</button>
+          <button class="btn" id="momentBtn">🎬 Next Message</button>
         </div>
-      </header>
 
-      <h1 class="title">
-        <span class="title-glow" aria-hidden="true"></span>
-        <span class="type" id="type"></span><span class="cursor">|</span>
-      </h1>
-
-      <p class="subtitle" id="subtitle">
-        Infinite hearts, infinite vibes, infinite us. ♾️💖
-      </p>
-
-      <div class="cta-row">
-        <button class="btn primary" id="burstBtn">💥 Love Burst</button>
-        <button class="btn" id="momentBtn">🎬 Next Moment</button>
-      </div>
-
-      <div class="micro">
-        <div class="meter" aria-hidden="true">
-          <span class="bar b1"></span><span class="bar b2"></span><span class="bar b3"></span><span class="bar b4"></span>
+        <div class="micro">
+          <div class="meter" aria-hidden="true">
+            <span class="bar b1"></span><span class="bar b2"></span><span class="bar b3"></span><span class="bar b4"></span>
+          </div>
+          <div class="hint">
+            Tap for sparkles • Drag for tilt • Press <kbd>H</kbd> hearts • Press <kbd>M</kbd> meteor • Switch screens top-right
+          </div>
         </div>
-        <div class="hint">
-          Tap for sparkles • Drag for tilt • Press <kbd>H</kbd> for hearts • Press <kbd>M</kbd> for meteors
+
+        <div class="signature">
+          <span class="sigline"></span>
+          <span class="sigtext">— for <b>Hannah Banana</b> 🍌💘</span>
         </div>
-      </div>
 
-      <div class="signature">
-        <span class="sigline"></span>
-        <span class="sigtext">— for <b>Hannah Banana</b> 🍌💘</span>
-      </div>
-
-      <div class="corner c1" aria-hidden="true"></div>
-      <div class="corner c2" aria-hidden="true"></div>
+        <div class="corner c1" aria-hidden="true"></div>
+        <div class="corner c2" aria-hidden="true"></div>
+      </section>
     </section>
 
-    <!-- CONTROL PANEL (slide-up on mobile) -->
+    <!-- SCREEN 2: DRAW -->
+    <section class="screen" id="screenDraw" aria-hidden="true">
+      <section class="card drawcard" id="cardDraw">
+        <div class="edge-glow" aria-hidden="true"></div>
+        <div class="sheen" aria-hidden="true"></div>
+
+        <div class="row">
+          <div class="badge small">
+            <span class="dot"></span>
+            <span class="text">Love Paint Studio</span>
+          </div>
+          <div class="tip">Use one finger • two-finger scroll won’t draw</div>
+        </div>
+
+        <div class="canvaswrap">
+          <canvas id="draw"></canvas>
+          <div class="canvas-glow" aria-hidden="true"></div>
+        </div>
+
+        <div class="tools">
+          <div class="toolgroup">
+            <div class="label">Mode</div>
+            <div class="chips">
+              <button class="chipbtn active" data-mode="brush">Brush</button>
+              <button class="chipbtn" data-mode="glow">Glow</button>
+              <button class="chipbtn" data-mode="heart">Hearts</button>
+              <button class="chipbtn" data-mode="star">Stars</button>
+            </div>
+          </div>
+
+          <div class="toolgroup">
+            <div class="label">Color</div>
+            <div class="palette" id="palette"></div>
+          </div>
+
+          <div class="toolgroup">
+            <div class="label">Size</div>
+            <input type="range" id="brushSize" min="2" max="26" step="1" value="10" />
+          </div>
+
+          <div class="toolactions">
+            <button class="btn" id="undoBtn">↩ Undo</button>
+            <button class="btn" id="clearBtn">🧼 Clear</button>
+            <button class="btn primary" id="saveBtn">📸 Save</button>
+          </div>
+        </div>
+
+        <div class="footerline" id="drawMsg"></div>
+      </section>
+    </section>
+
+    <!-- SCREEN 3: GAME -->
+    <section class="screen" id="screenGame" aria-hidden="true">
+      <section class="card gamecard" id="cardGame">
+        <div class="edge-glow" aria-hidden="true"></div>
+        <div class="sheen" aria-hidden="true"></div>
+
+        <div class="row">
+          <div class="badge small">
+            <span class="dot"></span>
+            <span class="text">Flappy Valentine</span>
+          </div>
+          <div class="scorebox">
+            <span class="scorelabel">Hearts:</span>
+            <span class="score" id="score">0</span>
+            <span class="scorelabel">Candy:</span>
+            <span class="score" id="candy">0</span>
+          </div>
+        </div>
+
+        <div class="canvaswrap gamewrap">
+          <canvas id="game"></canvas>
+          <div class="canvas-glow" aria-hidden="true"></div>
+
+          <div class="overlay" id="gameOverlay">
+            <div class="overlay-title">Tap to Start 💘</div>
+            <div class="overlay-sub">Tap to flap • Collect candy • Avoid the columns</div>
+            <button class="btn primary" id="startGameBtn">Start</button>
+          </div>
+        </div>
+
+        <div class="gamebar">
+          <button class="btn" id="pauseBtn">⏸ Pause</button>
+          <button class="btn" id="restartBtn">↺ Restart</button>
+          <button class="btn primary" id="megaCandyBtn">🍬 Candy Rush</button>
+        </div>
+
+        <div class="footerline" id="gameMsg"></div>
+      </section>
+    </section>
+
+    <!-- CONTROL PANEL -->
     <aside class="panel" id="panel" aria-hidden="true">
       <div class="panel-head">
         <div class="panel-title">Love Controls</div>
@@ -113,8 +210,8 @@
         <label class="toggle">
           <input type="checkbox" id="tHearts" checked />
           <span class="ui"></span>
-          <span class="lbl">Hearts</span>
-          <span class="desc">Floating hearts stream.</span>
+          <span class="lbl">Hearts Stream</span>
+          <span class="desc">Floating hearts in the background.</span>
         </label>
 
         <label class="toggle">
@@ -128,14 +225,7 @@
           <input type="checkbox" id="tConstellations" checked />
           <span class="ui"></span>
           <span class="lbl">Constellations</span>
-          <span class="desc">Lines connect near stars.</span>
-        </label>
-
-        <label class="toggle">
-          <input type="checkbox" id="tMusic" />
-          <span class="ui"></span>
-          <span class="lbl">Soft Music</span>
-          <span class="desc">Tiny synth pad (no file).</span>
+          <span class="desc">Star lines (lightweight).</span>
         </label>
 
         <label class="toggle">
