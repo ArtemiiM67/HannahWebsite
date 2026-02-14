@@ -8,13 +8,9 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- BACKGROUND FX CANVAS -->
   <canvas id="fx" aria-hidden="true"></canvas>
-
-  <!-- FLOATING HEART FIELD -->
   <div id="heartField" aria-hidden="true"></div>
 
-  <!-- INTRO / TAP TO START -->
   <div id="intro" class="intro" role="dialog" aria-label="Valentine intro">
     <div class="intro-card">
       <div class="intro-badge">💘 Valentine Mode</div>
@@ -27,7 +23,6 @@
     </div>
   </div>
 
-  <!-- TOP BAR -->
   <header class="topbar">
     <div class="brand">
       <span class="dot"></span>
@@ -40,7 +35,6 @@
     </div>
   </header>
 
-  <!-- RIGHT DRAWER / PANEL -->
   <aside id="panel" class="panel" aria-hidden="true">
     <div class="panel-head">
       <div class="panel-title">Controls</div>
@@ -104,9 +98,7 @@
     </div>
   </aside>
 
-  <!-- MAIN SCREENS -->
   <main class="wrap">
-    <!-- LOVE SCREEN -->
     <section id="screenLove" class="screen active" aria-hidden="false">
       <div id="cardLove" class="card hero">
         <div class="glowring" aria-hidden="true"></div>
@@ -127,7 +119,6 @@
       </div>
     </section>
 
-    <!-- DRAW SCREEN -->
     <section id="screenDraw" class="screen" aria-hidden="true">
       <div class="card">
         <div class="headrow">
@@ -162,7 +153,6 @@
       </div>
     </section>
 
-    <!-- GAME SCREEN -->
     <section id="screenGame" class="screen" aria-hidden="true">
       <div class="card">
         <div class="headrow">
@@ -170,7 +160,6 @@
           <div class="muted" id="gameMsg"></div>
         </div>
 
-        <!-- Game selector (NOW 5 GAMES) -->
         <div class="gameTabs" role="tablist" aria-label="Choose a game">
           <button id="tabFlappy" class="tab active" role="tab" aria-selected="true">Flappy Hearts</button>
           <button id="tabCatch" class="tab" role="tab" aria-selected="false">Heart Catch</button>
@@ -179,7 +168,6 @@
           <button id="tabPong" class="tab" role="tab" aria-selected="false">Love Pong</button>
         </div>
 
-        <!-- score strip -->
         <div class="scorebar">
           <div class="scorebox">
             <span id="labelA" class="scorelabel">Hearts:</span>
@@ -200,20 +188,17 @@
           </div>
         </div>
 
-        <!-- game stage -->
         <div class="stage">
           <div id="gameOverlay" class="overlay">
             <div class="overlay-card">
               <div class="overlay-title">Tap to Start 💘</div>
               <div class="overlay-sub">Pick a game above ✨</div>
-              <div class="overlay-hint">Tip: Eco mode helps if laggy</div>
+              <div class="overlay-hint">Tip: Eco mode helps on slower phones</div>
             </div>
           </div>
 
-          <!-- Canvas used by Flappy / Catch / Pop / Pong -->
           <canvas id="game" class="canvas" aria-label="Game canvas"></canvas>
 
-          <!-- Memory uses DOM grid -->
           <div id="memoryWrap" class="memory hidden" aria-label="Memory match">
             <div class="memoryTop">
               <div class="chip" id="memoryHint">Find all the pairs 💘</div>
@@ -226,7 +211,6 @@
     </section>
   </main>
 
-  <!-- BOTTOM NAV -->
   <nav class="nav" aria-label="Screens">
     <button id="toLove" class="navbtn active" aria-label="Love screen">💘 Love</button>
     <button id="toDraw" class="navbtn" aria-label="Draw screen">🎨 Draw</button>
